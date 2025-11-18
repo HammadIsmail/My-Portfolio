@@ -30,23 +30,23 @@ const Projects = () => {
   ];
 
   return (
-    <section id="projects" className="py-20 bg-background">
-      <div className="container mx-auto px-6">
-        <h2 className="text-4xl lg:text-5xl font-bold text-center mb-16">Projects</h2>
-        <div className="space-y-20">
+    <section id="projects" className="py-12 sm:py-16 lg:py-20 bg-background">
+      <div className="container mx-auto px-4 sm:px-6">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Projects</h2>
+        <div className="space-y-12 sm:space-y-16 lg:space-y-20">
           {projects.map((project) => (
             <Card 
               key={project.id}
               className="overflow-hidden border-none shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-300"
             >
               <div className={`grid lg:grid-cols-2 gap-0 ${project.imagePosition === 'left' ? 'lg:grid-flow-dense' : ''}`}>
-                <div className={`p-8 lg:p-12 flex flex-col justify-center ${project.imagePosition === 'left' ? 'lg:col-start-2' : ''}`}>
-                  <h3 className="text-3xl font-bold mb-4">{project.title}</h3>
-                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                <div className={`p-6 sm:p-8 lg:p-12 flex flex-col justify-center ${project.imagePosition === 'left' ? 'lg:col-start-2' : ''}`}>
+                  <h3 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{project.title}</h3>
+                  <p className="text-muted-foreground mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
                     {project.description}
                   </p>
                   <div>
-                    <Button variant="outline">View Project</Button>
+                    <Button variant="outline" className="w-full sm:w-auto min-h-[44px]">View Project</Button>
                   </div>
                 </div>
                 <div className={`relative aspect-[4/3] lg:aspect-auto ${project.imagePosition === 'left' ? 'lg:col-start-1 lg:row-start-1' : ''}`}>

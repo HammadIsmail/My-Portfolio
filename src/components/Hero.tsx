@@ -8,32 +8,32 @@ const Hero = () => {
   };
 
   return (
-    <section id="about" className="min-h-screen flex items-center pt-20">
-      <div className="container mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <p className="text-sm font-semibold tracking-wider text-primary uppercase">
+    <section id="about" className="min-h-screen flex items-center pt-20 sm:pt-24">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+          <div className="space-y-4 sm:space-y-6 text-center lg:text-left">
+            <p className="text-xs sm:text-sm font-semibold tracking-wider text-primary uppercase">
               UI/UX Designer
             </p>
-            <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
               Hello, my name is Madelyn Torff
             </h1>
-            <p className="text-lg text-muted-foreground max-w-md">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto lg:mx-0">
               Short text with details about you, what you do or your professional career. You can add more information on the about page.
             </p>
-            <div className="flex gap-4 pt-4">
-              <Button onClick={() => scrollToSection("projects")} size="lg">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 justify-center lg:justify-start">
+              <Button onClick={() => scrollToSection("projects")} size="lg" className="w-full sm:w-auto min-h-[48px]">
                 Projects
               </Button>
-              <Button variant="outline" size="lg" asChild>
+              <Button variant="outline" size="lg" asChild className="w-full sm:w-auto min-h-[48px]">
                 <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
                   LinkedIn
                 </a>
               </Button>
             </div>
           </div>
-          <div className="relative">
-            <div className="relative w-full aspect-square max-w-lg mx-auto">
+          <div className="relative order-first lg:order-last">
+            <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[400px] lg:max-w-lg mx-auto">
               <div className="absolute inset-0 bg-primary rounded-full"></div>
               <img 
                 src={heroImage} 
