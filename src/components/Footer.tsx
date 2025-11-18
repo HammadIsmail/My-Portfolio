@@ -32,7 +32,7 @@ const Footer = () => {
           </a>
         </div>
         <p className="text-center text-sm text-muted-foreground">
-          Madelyn Torff 2021
+          Hammad © {new Date().getFullYear()}. All rights reserved.
         </p>
       </div>
       
