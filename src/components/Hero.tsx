@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-portrait.jpg";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Hero = () => {
+  const { ref, isVisible } = useScrollAnimation();
+  
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     element?.scrollIntoView({ behavior: "smooth" });
@@ -10,8 +13,8 @@ const Hero = () => {
   return (
     <section id="about" className="min-h-screen flex items-center pt-20 sm:pt-24">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
-          <div className="space-y-4 sm:space-y-6 text-center lg:text-left">
+        <div ref={ref} className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+          <div className={`space-y-4 sm:space-y-6 text-center lg:text-left transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <p className="text-xs sm:text-sm font-semibold tracking-wider text-primary uppercase">
               UI/UX Designer
             </p>
@@ -32,7 +35,7 @@ const Hero = () => {
               </Button>
             </div>
           </div>
-          <div className="relative order-first lg:order-last">
+          <div className={`relative order-first lg:order-last transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[400px] lg:max-w-lg mx-auto">
               <div className="absolute inset-0 bg-primary rounded-full"></div>
               <img 
