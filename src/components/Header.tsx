@@ -1,17 +1,24 @@
-import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useState } from "react";
 
 const Header = () => {
+  const [open, setOpen] = useState(false);
+
   const scrollToSection = (id: string) => {
+    setOpen(false);
     const element = document.getElementById(id);
     element?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-6 py-4">
+      <div className="container mx-auto px-4 sm:px-6 py-4">
         <nav className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">Madelyn Torff</h1>
-          <div className="flex gap-8">
+          <h1 className="text-lg sm:text-xl font-bold">Madelyn Torff</h1>
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex gap-8">
             <button 
               onClick={() => scrollToSection("about")}
               className="text-sm font-medium hover:text-primary transition-colors"
@@ -28,9 +35,39 @@ const Header = () => {
               onClick={() => scrollToSection("contact")}
               className="text-sm font-medium hover:text-primary transition-colors"
             >
-              Contacts
+              Contact
             </button>
           </div>
+
+          {/* Mobile Navigation */}
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger className="md:hidden p-2 hover:bg-accent rounded-lg transition-colors touch-manipulation">
+              <Menu className="w-6 h-6" />
+              <span className="sr-only">Open menu</span>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[250px] sm:w-[300px]">
+              <div className="flex flex-col gap-6 mt-8">
+                <button
+                  onClick={() => scrollToSection("about")}
+                  className="text-left text-lg font-medium hover:text-primary transition-colors touch-manipulation py-2"
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => scrollToSection("projects")}
+                  className="text-left text-lg font-medium hover:text-primary transition-colors touch-manipulation py-2"
+                >
+                  Projects
+                </button>
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="text-left text-lg font-medium hover:text-primary transition-colors touch-manipulation py-2"
+                >
+                  Contact
+                </button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </nav>
       </div>
     </header>
