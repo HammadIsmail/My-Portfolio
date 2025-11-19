@@ -1,4 +1,4 @@
-import { Code, Palette, Smartphone, Zap } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
 
 const Skills = () => {
@@ -6,10 +6,29 @@ const Skills = () => {
   const sectionRef = useRef<HTMLElement>(null);
 
   const skills = [
-    { name: "UI/UX Design", level: 95, icon: Palette },
-    { name: "Figma", level: 90, icon: Code },
-    { name: "Responsive Design", level: 88, icon: Smartphone },
-    { name: "Prototyping", level: 85, icon: Zap },
+    { name: "React", icon: "logos:react" },
+    { name: "Next.js", icon: "logos:nextjs-icon" },
+    { name: "TypeScript", icon: "logos:typescript-icon" },
+    { name: "Node.js", icon: "logos:nodejs-icon" },
+    { name: "React Native", icon: "logos:react" },
+    { name: "TailwindCSS", icon: "logos:tailwindcss-icon" },
+    { name: "MongoDB", icon: "logos:mongodb-icon" },
+    { name: "PostgreSQL", icon: "logos:postgresql" },
+    { name: "SQLite", icon: "devicon:sqlite" },
+    { name: "Socket.IO", icon: "simple-icons:socketdotio" },
+    { name: "AWS", icon: "logos:aws" },
+    { name: "FastAPI", icon: "devicon:fastapi" },
+    { name: "AI Integration", icon: "hugeicons:ai-brain-04" },
+    { name: "OpenAI APIs", icon: "simple-icons:openai" }
+  ];
+
+  const tools = [
+    { name: "Git", icon: "logos:git-icon" },
+    { name: "GitHub", icon: "mdi:github" },
+    { name: "Postman", icon: "logos:postman-icon" },
+    { name: "Docker", icon: "logos:docker-icon" },
+    { name: "Ollama", icon: "simple-icons:ollama" },
+    { name: "Prisma", icon: "logos:prisma" }
   ];
 
   useEffect(() => {
@@ -44,60 +63,53 @@ const Skills = () => {
           Skills
         </h2>
 
-        {/* Icon Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
-          {skills.map((skill, index) => {
-            const Icon = skill.icon;
-            return (
-              <div
-                key={skill.name}
-                className={`flex flex-col items-center p-6 sm:p-8 rounded-2xl bg-card hover:shadow-[var(--shadow-hover)] transition-all duration-300 ${
-                  isVisible ? "animate-fade-in" : "opacity-0"
-                }`}
-                style={{
-                  animationDelay: isVisible ? `${index * 100}ms` : "0ms",
-                }}
-              >
-                <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full bg-primary/10 mb-3 sm:mb-4">
-                  <Icon className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                </div>
-                <h3 className="text-sm sm:text-base font-semibold text-center">
-                  {skill.name}
-                </h3>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Progress Bars */}
-        <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+        {/* Skills Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {skills.map((skill, index) => (
             <div
               key={skill.name}
-              className={`${isVisible ? "animate-fade-in" : "opacity-0"}`}
+              className={`flex flex-col items-center p-4 sm:p-6 rounded-2xl bg-card hover:shadow-[var(--shadow-hover)] transition-all duration-300 ${
+                isVisible ? "animate-fade-in" : "opacity-0"
+              }`}
               style={{
-                animationDelay: isVisible ? `${index * 150}ms` : "0ms",
+                animationDelay: isVisible ? `${index * 50}ms` : "0ms",
               }}
             >
-              <div className="flex justify-between items-center mb-2 sm:mb-3">
-                <span className="text-sm sm:text-base font-medium">
-                  {skill.name}
-                </span>
-                <span className="text-sm sm:text-base font-semibold text-primary">
-                  {skill.level}%
-                </span>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-3">
+                <Icon icon={skill.icon} className="w-full h-full" />
               </div>
-              <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: isVisible ? `${skill.level}%` : "0%",
-                    transitionDelay: isVisible ? `${index * 150}ms` : "0ms",
-                  }}
-                />
-              </div>
+              <h3 className="text-xs sm:text-sm font-semibold text-center">
+                {skill.name}
+              </h3>
             </div>
           ))}
+        </div>
+
+        {/* Tools Section */}
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">
+            Tools
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+            {tools.map((tool, index) => (
+              <div
+                key={tool.name}
+                className={`flex flex-col items-center p-4 sm:p-6 rounded-2xl bg-card hover:shadow-[var(--shadow-hover)] transition-all duration-300 ${
+                  isVisible ? "animate-fade-in" : "opacity-0"
+                }`}
+                style={{
+                  animationDelay: isVisible ? `${(skills.length + index) * 50}ms` : "0ms",
+                }}
+              >
+                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mb-3">
+                  <Icon icon={tool.icon} className="w-full h-full" />
+                </div>
+                <h3 className="text-xs sm:text-sm font-semibold text-center">
+                  {tool.name}
+                </h3>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
