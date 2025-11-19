@@ -33,7 +33,7 @@ const Hero = () => {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
               Hello, my name is Hammad
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto lg:mx-0">
+            <p className="text-base text-center sm:text-lg text-muted-foreground max-w-md mx-auto lg:mx-0">
               Hi, I'm Hammad, a Full-Stack Developer specializing in the MERN
               stack. I build scalable web and mobile applications using React,
               Next.js, React Native, Express.js, and FastAPI, with real-time
