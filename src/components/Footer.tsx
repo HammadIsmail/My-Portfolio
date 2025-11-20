@@ -24,9 +24,6 @@ const Footer = () => {
             </a>
           ))}
         </div>
-        <p className="text-center text-sm text-muted-foreground">
-          Hammad © {new Date().getFullYear()}. All rights reserved.
-        </p>
       </div>
       
       {/* Decorative Wave */}
