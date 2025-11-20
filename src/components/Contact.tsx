@@ -1,33 +1,42 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import emailjs from "emailjs-com";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+
+const formSchema = z.object({
+  name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100, { message: "Name must be less than 100 characters" }),
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
+  message: z.string().trim().min(10, { message: "Message must be at least 10 characters" }).max(1000, { message: "Message must be less than 1000 characters" }),
+});
 
 const Contact = () => {
   const { ref, isVisible } = useScrollAnimation();
   const formRef = useRef<HTMLFormElement>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+  });
 
   // EmailJS credentials
   const serviceId = "service_42m4lca";
   const templateId = "template_5rfqb7d";
   const userId = "jKYS-Zm28fRW5zF8Q";
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!formRef.current) return;
-
-    setIsSubmitting(true);
 
     emailjs
       .sendForm(serviceId, templateId, formRef.current, userId)
@@ -38,7 +47,7 @@ const Contact = () => {
             title: "Message sent!",
             description: "Thank you for reaching out. I'll get back to you soon.",
           });
-          setFormData({ name: "", email: "", message: "" });
+          form.reset();
         },
         (error) => {
           console.error('Failed to send email:', error.text);
@@ -48,10 +57,7 @@ const Contact = () => {
             variant: "destructive",
           });
         }
-      )
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+      );
   };
 
   return (
@@ -59,53 +65,75 @@ const Contact = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Contact</h2>
         <div ref={ref} className={`max-w-xl mx-auto transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            <div>
-              <Input
-                type="text"
+          <Form {...form}>
+            <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+              <FormField
+                control={form.control}
                 name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                disabled={isSubmitting}
-                className="h-12 sm:h-14 bg-card border-border text-base"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Name"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        className="h-12 sm:h-14 bg-card border-border text-base"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <Input
-                type="email"
+              
+              <FormField
+                control={form.control}
                 name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                disabled={isSubmitting}
-                className="h-12 sm:h-14 bg-card border-border text-base"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        className="h-12 sm:h-14 bg-card border-border text-base"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <Textarea
+              
+              <FormField
+                control={form.control}
                 name="message"
-                placeholder="Message"
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                required
-                disabled={isSubmitting}
-                className="min-h-[150px] sm:min-h-[180px] bg-card border-border resize-none text-base"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Message"
+                        {...field}
+                        disabled={form.formState.isSubmitting}
+                        className="min-h-[150px] sm:min-h-[180px] bg-card border-border resize-none text-base"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="text-center pt-2">
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full sm:w-auto sm:px-12 min-h-[48px]"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Sending..." : "Send"}
-              </Button>
-            </div>
-          </form>
+              
+              <div className="text-center pt-2">
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="w-full sm:w-auto sm:px-12 min-h-[48px]"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? "Sending..." : "Send"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </section>
