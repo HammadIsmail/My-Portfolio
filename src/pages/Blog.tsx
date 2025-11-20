@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 interface BlogPost {
-  id: number;
+  id: number | string;
   title: string;
   excerpt: string;
   date: string;
@@ -81,6 +82,14 @@ const blogPosts: BlogPost[] = [
 ];
 
 const Blog = () => {
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
+
+  useEffect(() => {
+    // Load custom posts from localStorage
+    const customPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
+    setAllPosts([...customPosts, ...blogPosts]);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -103,7 +112,7 @@ const Blog = () => {
 
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {blogPosts.map((post) => (
+            {allPosts.map((post) => (
               <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
                 <div className="relative h-48 overflow-hidden">
                   <img 
