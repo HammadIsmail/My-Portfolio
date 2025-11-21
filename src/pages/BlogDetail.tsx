@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SocialShare from "@/components/SocialShare";
+import { Helmet } from "react-helmet";
 
 interface BlogPost {
   id: number | string;
@@ -119,8 +121,29 @@ const BlogDetail = () => {
     return null;
   }
 
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{post.title} | Blog</title>
+        <meta name="description" content={post.excerpt} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:image" content={post.image} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={currentUrl} />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:image" content={post.image} />
+      </Helmet>
+      
       <Header />
       
       <main className="flex-1 pt-20 sm:pt-24 pb-12 sm:pb-16 lg:pb-20">
@@ -176,6 +199,15 @@ const BlogDetail = () => {
             className="prose prose-lg max-w-none mb-12"
             dangerouslySetInnerHTML={{ __html: post.content || post.excerpt }}
           />
+
+          {/* Social Share */}
+          <div className="py-8 border-t border-b mb-8">
+            <SocialShare
+              url={currentUrl}
+              title={post.title}
+              description={post.excerpt}
+            />
+          </div>
 
           {/* Navigation */}
           <div className="flex justify-between items-center pt-8 border-t">
