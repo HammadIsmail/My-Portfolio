@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BlogFilters from "@/components/BlogFilters";
 
 interface BlogPost {
   id: number | string;
@@ -84,12 +85,48 @@ const blogPosts: BlogPost[] = [
 
 const Blog = () => {
   const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedTag, setSelectedTag] = useState("");
 
   useEffect(() => {
     // Load custom posts from localStorage
     const customPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
     setAllPosts([...customPosts, ...blogPosts]);
   }, []);
+
+  // Extract unique categories and tags
+  const categories = useMemo(() => {
+    const cats = new Set(allPosts.map((post) => post.category));
+    return Array.from(cats).sort();
+  }, [allPosts]);
+
+  const tags = useMemo(() => {
+    const tagSet = new Set<string>();
+    allPosts.forEach((post) => post.tags.forEach((tag) => tagSet.add(tag)));
+    return Array.from(tagSet).sort();
+  }, [allPosts]);
+
+  // Filter posts based on search and filters
+  const filteredPosts = useMemo(() => {
+    return allPosts.filter((post) => {
+      const matchesSearch =
+        !searchQuery ||
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = !selectedCategory || post.category === selectedCategory;
+      const matchesTag = !selectedTag || post.tags.includes(selectedTag);
+
+      return matchesSearch && matchesCategory && matchesTag;
+    });
+  }, [allPosts, searchQuery, selectedCategory, selectedTag]);
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("");
+    setSelectedTag("");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -111,9 +148,30 @@ const Blog = () => {
             </p>
           </div>
 
+          {/* Filters */}
+          <BlogFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedTag={selectedTag}
+            setSelectedTag={setSelectedTag}
+            categories={categories}
+            tags={tags}
+            onClearFilters={handleClearFilters}
+          />
+
           {/* Blog Grid */}
+          {filteredPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No posts found matching your filters.</p>
+              <Button variant="link" onClick={handleClearFilters} className="mt-2">
+                Clear all filters
+              </Button>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {allPosts.map((post) => (
+            {filteredPosts.map((post) => (
               <Link key={post.id} to={`/blog/${post.id}`}>
                 <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
                 <div className="relative h-48 overflow-hidden">
@@ -160,6 +218,7 @@ const Blog = () => {
               </Link>
             ))}
           </div>
+          )}
 
           {/* Coming Soon Message */}
           <div className="mt-12 text-center">
