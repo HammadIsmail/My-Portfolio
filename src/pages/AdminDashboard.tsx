@@ -8,11 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface BlogPost {
   id: string;
   title: string;
   excerpt: string;
+  content: string;
   date: string;
   readTime: string;
   category: string;
@@ -24,6 +26,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [tags, setTags] = useState("");
   const [image, setImage] = useState("");
@@ -50,11 +53,8 @@ const AdminDashboard = () => {
       id: Date.now().toString(),
       title,
       excerpt,
-      date: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
+      content,
+      date: new Date().toISOString().split('T')[0],
       readTime: readTime || "5 min read",
       category,
       tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
@@ -71,6 +71,7 @@ const AdminDashboard = () => {
     // Reset form
     setTitle("");
     setExcerpt("");
+    setContent("");
     setCategory("");
     setTags("");
     setImage("");
@@ -125,6 +126,14 @@ const AdminDashboard = () => {
                   required
                   placeholder="Write a short description"
                   rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="content">Full Content *</Label>
+                <RichTextEditor
+                  content={content}
+                  onChange={setContent}
                 />
               </div>
 

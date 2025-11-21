@@ -11,6 +11,7 @@ interface BlogPost {
   id: number | string;
   title: string;
   excerpt: string;
+  content?: string;
   date: string;
   readTime: string;
   category: string;
@@ -113,7 +114,8 @@ const Blog = () => {
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {allPosts.map((post) => (
-              <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+              <Link key={post.id} to={`/blog/${post.id}`}>
+                <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
                 <div className="relative h-48 overflow-hidden">
                   <img 
                     src={post.image} 
@@ -155,6 +157,7 @@ const Blog = () => {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
 
