@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RichTextEditor from "@/components/RichTextEditor";
 import MarkdownEditor from "@/components/MarkdownEditor";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 
 interface BlogPost {
   id: string;
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editorMode, setEditorMode] = useState<"rich" | "markdown">("rich");
+  const [activeTab, setActiveTab] = useState("posts");
   
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -140,6 +142,52 @@ const AdminDashboard = () => {
     setShowForm(false);
   };
 
+  // Analytics calculations
+  const analytics = useMemo(() => {
+    const allPostIds = [...posts.map(p => p.id), 1, 2, 3, 4, 5, 6];
+    const viewsData = allPostIds.map(id => ({
+      postId: id,
+      views: parseInt(localStorage.getItem(`post_views_${id}`) || "0")
+    }));
+
+    const totalViews = viewsData.reduce((sum, item) => sum + item.views, 0);
+    
+    const popularPosts = viewsData
+      .filter(v => v.views > 0)
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 5)
+      .map(v => {
+        const post = posts.find(p => p.id === v.postId);
+        return {
+          title: post?.title || `Post ${v.postId}`,
+          views: v.views
+        };
+      });
+
+    const categoryData = posts.reduce((acc, post) => {
+      acc[post.category] = (acc[post.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const categoryChartData = Object.entries(categoryData).map(([name, value]) => ({
+      name,
+      value
+    }));
+
+    const comments = JSON.parse(localStorage.getItem("blogComments") || "[]");
+    const totalComments = comments.length;
+
+    return {
+      totalViews,
+      totalPosts: posts.length,
+      totalComments,
+      popularPosts,
+      categoryChartData
+    };
+  }, [posts]);
+
+  const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))', 'hsl(var(--destructive))', 'hsl(var(--warning))'];
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
@@ -159,6 +207,14 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="posts">Blog Posts</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
+
+          {/* Posts Tab */}
+          <TabsContent value="posts" className="space-y-6">
         {/* Posts List */}
         {!showForm && (
           <Card className="mb-8">
@@ -318,6 +374,121 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         )}
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+                  <Eye className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics.totalViews}</div>
+                  <p className="text-xs text-muted-foreground">Across all blog posts</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics.totalPosts}</div>
+                  <p className="text-xs text-muted-foreground">Published articles</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Comments</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analytics.totalComments}</div>
+                  <p className="text-xs text-muted-foreground">Reader engagement</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Popular Posts */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Popular Posts</CardTitle>
+                  <CardDescription>Top 5 posts by views</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {analytics.popularPosts.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No views yet</p>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={analytics.popularPosts}>
+                        <XAxis 
+                          dataKey="title" 
+                          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={100}
+                        />
+                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--background))',
+                            border: '1px solid hsl(var(--border))'
+                          }}
+                        />
+                        <Bar dataKey="views" fill="hsl(var(--primary))" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Category Distribution */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Category Distribution</CardTitle>
+                  <CardDescription>Posts by category</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {analytics.categoryChartData.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No posts yet</p>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={analytics.categoryChartData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="hsl(var(--primary))"
+                          dataKey="value"
+                        >
+                          {analytics.categoryChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--background))',
+                            border: '1px solid hsl(var(--border))'
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </main>
       <Footer />
     </div>
