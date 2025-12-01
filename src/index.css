@@ -124,6 +124,93 @@ All colors MUST be HSL.
   p {
     color: hsl(var(--text-body));
   }
+
+  /* Prose styles for blog editor */
+  .prose {
+    max-width: none;
+  }
+
+  .prose h1 {
+    @apply text-4xl font-bold mb-4;
+  }
+
+  .prose h2 {
+    @apply text-3xl font-bold mb-3 mt-6;
+  }
+
+  .prose h3 {
+    @apply text-2xl font-bold mb-2 mt-4;
+  }
+
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
+
+  .prose ul, .prose ol {
+    @apply mb-4 ml-6;
+  }
+
+  .prose li {
+    @apply mb-2;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary pl-4 italic my-4;
+  }
+
+  .prose code {
+    @apply bg-muted px-2 py-1 rounded text-sm;
+  }
+
+  .prose pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto my-4;
+  }
+
+  .prose img {
+    @apply rounded-lg my-4;
+  }
+
+  .prose a {
+    @apply text-primary underline hover:no-underline;
+  }
+
+  .prose hr {
+    @apply my-8 border-border;
+  }
+
+  .prose table {
+    @apply w-full my-4;
+  }
+
+  .prose th {
+    @apply bg-muted p-3 text-left font-bold border border-border;
+  }
+
+  .prose td {
+    @apply p-3 border border-border;
+  }
+
+  /* TipTap specific styles */
+  .ProseMirror {
+    outline: none;
+  }
+
+  .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+    height: 0;
+  }
+
+  .ProseMirror img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .ProseMirror img.ProseMirror-selectednode {
+    outline: 3px solid hsl(var(--primary));
+  }
 }
 
 @keyframes bounce-subtle {
