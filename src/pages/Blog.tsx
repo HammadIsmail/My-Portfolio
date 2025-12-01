@@ -7,6 +7,15 @@ import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BlogFilters from "@/components/BlogFilters";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface BlogPost {
   id: number | string;
@@ -83,11 +92,14 @@ const blogPosts: BlogPost[] = [
   }
 ];
 
+const POSTS_PER_PAGE = 12;
+
 const Blog = () => {
   const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     // Load custom posts from localStorage
@@ -126,7 +138,19 @@ const Blog = () => {
     setSearchQuery("");
     setSelectedCategory("");
     setSelectedTag("");
+    setCurrentPage(1);
   };
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedTag]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -170,8 +194,9 @@ const Blog = () => {
               </Button>
             </div>
           ) : (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {filteredPosts.map((post) => (
+            {paginatedPosts.map((post) => (
               <Link key={post.id} to={`/blog/${post.id}`}>
                 <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
                 <div className="relative h-48 overflow-hidden">
@@ -218,14 +243,73 @@ const Blog = () => {
               </Link>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-12">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                    // Show first page, last page, current page, and pages around current
+                    const showPage = 
+                      page === 1 || 
+                      page === totalPages || 
+                      (page >= currentPage - 1 && page <= currentPage + 1);
+                    
+                    const showEllipsisBefore = page === currentPage - 2 && currentPage > 3;
+                    const showEllipsisAfter = page === currentPage + 2 && currentPage < totalPages - 2;
+
+                    if (showEllipsisBefore || showEllipsisAfter) {
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+
+                    if (!showPage) return null;
+
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  })}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+          </>
           )}
 
-          {/* Coming Soon Message */}
-          <div className="mt-12 text-center">
-            <p className="text-muted-foreground text-sm">
-              More articles coming soon. Stay tuned for updates on web development, architecture, and tech trends.
-            </p>
-          </div>
+          {/* Showing Results Info */}
+          {filteredPosts.length > 0 && (
+            <div className="mt-8 text-center">
+              <p className="text-muted-foreground text-sm">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredPosts.length)} of {filteredPosts.length} posts
+              </p>
+            </div>
+          )}
         </div>
       </main>
 

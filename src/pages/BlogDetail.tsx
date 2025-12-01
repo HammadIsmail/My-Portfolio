@@ -2,11 +2,16 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Calendar, Clock, ArrowLeft, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SocialShare from "@/components/SocialShare";
 import { Helmet } from "react-helmet";
+import { toast } from "sonner";
 
 interface BlogPost {
   id: number | string;
@@ -20,12 +25,26 @@ interface BlogPost {
   image: string;
 }
 
+interface Comment {
+  id: string;
+  postId: string;
+  author: string;
+  email: string;
+  content: string;
+  date: string;
+}
+
 const BlogDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [prevPost, setPrevPost] = useState<BlogPost | null>(null);
   const [nextPost, setNextPost] = useState<BlogPost | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentAuthor, setCommentAuthor] = useState("");
+  const [commentEmail, setCommentEmail] = useState("");
+  const [commentContent, setCommentContent] = useState("");
 
   useEffect(() => {
     const customPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
@@ -104,6 +123,11 @@ const BlogDetail = () => {
     if (foundPost) {
       setPost(foundPost);
       
+      // Track view count
+      const viewsKey = `post_views_${id}`;
+      const currentViews = parseInt(localStorage.getItem(viewsKey) || "0");
+      localStorage.setItem(viewsKey, (currentViews + 1).toString());
+      
       // Find adjacent posts
       const currentIndex = allPosts.findIndex(p => p.id.toString() === id);
       if (currentIndex > 0) {
@@ -112,10 +136,55 @@ const BlogDetail = () => {
       if (currentIndex < allPosts.length - 1) {
         setPrevPost(allPosts[currentIndex + 1]);
       }
+
+      // Find related posts based on matching tags or category
+      const related = allPosts
+        .filter(p => p.id.toString() !== id)
+        .map(p => {
+          let score = 0;
+          if (p.category === foundPost.category) score += 3;
+          const matchingTags = p.tags.filter(tag => foundPost.tags.includes(tag)).length;
+          score += matchingTags * 2;
+          return { post: p, score };
+        })
+        .filter(({ score }) => score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(({ post }) => post);
+      
+      setRelatedPosts(related);
+
+      // Load comments
+      const allComments = JSON.parse(localStorage.getItem("blogComments") || "[]");
+      const postComments = allComments.filter((c: Comment) => c.postId === id);
+      setComments(postComments);
     } else {
       navigate("/blog");
     }
   }, [id, navigate]);
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newComment: Comment = {
+      id: Date.now().toString(),
+      postId: id!,
+      author: commentAuthor,
+      email: commentEmail,
+      content: commentContent,
+      date: new Date().toISOString(),
+    };
+
+    const allComments = JSON.parse(localStorage.getItem("blogComments") || "[]");
+    const updatedComments = [newComment, ...allComments];
+    localStorage.setItem("blogComments", JSON.stringify(updatedComments));
+    
+    setComments([newComment, ...comments]);
+    setCommentAuthor("");
+    setCommentEmail("");
+    setCommentContent("");
+    toast.success("Comment posted successfully!");
+  };
 
   if (!post) {
     return null;
@@ -207,6 +276,127 @@ const BlogDetail = () => {
               title={post.title}
               description={post.excerpt}
             />
+          </div>
+
+          {/* Related Posts */}
+          {relatedPosts.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold mb-6">Related Posts</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {relatedPosts.map((relatedPost) => (
+                  <Link key={relatedPost.id} to={`/blog/${relatedPost.id}`}>
+                    <Card className="group hover:shadow-lg transition-all duration-300 h-full">
+                      <div className="relative h-32 overflow-hidden">
+                        <img 
+                          src={relatedPost.image} 
+                          alt={relatedPost.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <CardHeader>
+                        <CardTitle className="text-base group-hover:text-primary transition-colors line-clamp-2">
+                          {relatedPost.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(relatedPost.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Comments Section */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <MessageCircle className="w-6 h-6" />
+              Comments ({comments.length})
+            </h2>
+            
+            {/* Comment Form */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-lg">Leave a Comment</CardTitle>
+                <p className="text-sm text-muted-foreground">⚠️ Using localStorage - upgrade to Lovable Cloud for production</p>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleCommentSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="author">Name *</Label>
+                      <Input
+                        id="author"
+                        value={commentAuthor}
+                        onChange={(e) => setCommentAuthor(e.target.value)}
+                        required
+                        placeholder="Your name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={commentEmail}
+                        onChange={(e) => setCommentEmail(e.target.value)}
+                        required
+                        placeholder="your@email.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="comment">Comment *</Label>
+                    <Textarea
+                      id="comment"
+                      value={commentContent}
+                      onChange={(e) => setCommentContent(e.target.value)}
+                      required
+                      placeholder="Share your thoughts..."
+                      rows={4}
+                    />
+                  </div>
+                  <Button type="submit">Post Comment</Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Comments List */}
+            {comments.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No comments yet. Be the first to comment!
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {comments.map((comment) => (
+                  <Card key={comment.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold">{comment.author}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(comment.date).toLocaleDateString('en-US', { 
+                              month: 'long', 
+                              day: 'numeric', 
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm">{comment.content}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
