@@ -13,7 +13,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RichTextEditor from "@/components/RichTextEditor";
 import MarkdownEditor from "@/components/MarkdownEditor";
-import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save } from "lucide-react";
+import CategoryManager from "@/components/CategoryManager";
+import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save, Tag } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Calendar, Clock } from "lucide-react";
 
@@ -27,6 +29,9 @@ interface BlogPost {
   category: string;
   tags: string[];
   image: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  slug?: string;
 }
 
 const AdminDashboard = () => {
@@ -47,6 +52,10 @@ const AdminDashboard = () => {
   const [tags, setTags] = useState("");
   const [image, setImage] = useState("");
   const [readTime, setReadTime] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [slug, setSlug] = useState("");
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -55,14 +64,20 @@ const AdminDashboard = () => {
       navigate("/admin/login");
     }
     
-    // Load posts
+    // Load posts and categories
     loadPosts();
+    loadCategories();
 
     // Load draft on mount if editing
     if (showForm) {
       loadDraft();
     }
   }, [navigate, showForm]);
+
+  const loadCategories = () => {
+    const stored = JSON.parse(localStorage.getItem('blogCategories') || '[]');
+    setCategories(stored);
+  };
 
   // Auto-save functionality
   useEffect(() => {
@@ -86,7 +101,21 @@ const AdminDashboard = () => {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [title, excerpt, content, category, tags, image, readTime, showForm]);
+  }, [title, excerpt, content, category, tags, image, readTime, metaTitle, metaDescription, slug, showForm]);
+
+  // Auto-generate slug from title
+  useEffect(() => {
+    if (title && !editingPost && !slug) {
+      const generatedSlug = title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .substring(0, 60);
+      setSlug(generatedSlug);
+    }
+  }, [title, editingPost, slug]);
 
   const loadPosts = () => {
     const existingPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
@@ -108,6 +137,9 @@ const AdminDashboard = () => {
     setTags(post.tags.join(", "));
     setImage(post.image);
     setReadTime(post.readTime);
+    setMetaTitle(post.metaTitle || "");
+    setMetaDescription(post.metaDescription || "");
+    setSlug(post.slug || "");
     setShowForm(true);
   };
 
@@ -123,6 +155,22 @@ const AdminDashboard = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate slug
+    if (!slug || !slug.trim()) {
+      toast.error("URL slug is required");
+      return;
+    }
+
+    // Check for duplicate slug
+    const isDuplicateSlug = posts.some(
+      p => p.slug === slug && p.id !== editingPost?.id
+    );
+
+    if (isDuplicateSlug) {
+      toast.error("A post with this URL slug already exists");
+      return;
+    }
+
     if (editingPost) {
       // Update existing post
       const updatedPost: BlogPost = {
@@ -134,6 +182,9 @@ const AdminDashboard = () => {
         tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         image: image || editingPost.image,
         readTime: readTime || editingPost.readTime,
+        metaTitle: metaTitle || title,
+        metaDescription: metaDescription || excerpt,
+        slug: slug.trim(),
       };
 
       const updatedPosts = posts.map((p) => (p.id === editingPost.id ? updatedPost : p));
@@ -152,6 +203,9 @@ const AdminDashboard = () => {
         category,
         tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         image: image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=800",
+        metaTitle: metaTitle || title,
+        metaDescription: metaDescription || excerpt,
+        slug: slug.trim(),
       };
 
       const updatedPosts = [newPost, ...posts];
@@ -173,6 +227,9 @@ const AdminDashboard = () => {
       tags,
       image,
       readTime,
+      metaTitle,
+      metaDescription,
+      slug,
       editingPostId: editingPost?.id,
       savedAt: new Date().toISOString(),
     };
@@ -208,6 +265,9 @@ const AdminDashboard = () => {
     setTags("");
     setImage("");
     setReadTime("");
+    setMetaTitle("");
+    setMetaDescription("");
+    setSlug("");
     setEditingPost(null);
     setShowForm(false);
     setPreviewMode(false);
@@ -282,6 +342,10 @@ const AdminDashboard = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="posts">Blog Posts</TabsTrigger>
+            <TabsTrigger value="categories">
+              <Tag className="w-4 h-4 mr-2" />
+              Categories
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -463,13 +527,24 @@ const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category *</Label>
-                  <Input
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                    placeholder="e.g., Technology, Design"
-                  />
+                  <Select value={category} onValueChange={setCategory} required>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.length === 0 ? (
+                        <SelectItem value="uncategorized" disabled>
+                          No categories - create one first
+                        </SelectItem>
+                      ) : (
+                        categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.name}>
+                            {cat.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -495,13 +570,64 @@ const AdminDashboard = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Image URL</Label>
+                <Label htmlFor="image">Featured Image URL</Label>
                 <Input
                   id="image"
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
                   placeholder="https://example.com/image.jpg (optional)"
                 />
+              </div>
+
+              {/* SEO Section */}
+              <div className="border-t pt-6 space-y-4">
+                <h3 className="text-lg font-semibold">SEO Settings</h3>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="slug">URL Slug *</Label>
+                  <Input
+                    id="slug"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    required
+                    placeholder="e.g., my-awesome-blog-post"
+                    pattern="[a-z0-9-]+"
+                    title="Only lowercase letters, numbers, and hyphens"
+                    maxLength={60}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Used in URL: /blog/{slug || 'your-post-slug'}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="metaTitle">Meta Title</Label>
+                  <Input
+                    id="metaTitle"
+                    value={metaTitle}
+                    onChange={(e) => setMetaTitle(e.target.value)}
+                    placeholder={title || "Post title for search engines"}
+                    maxLength={60}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {metaTitle.length}/60 characters (defaults to post title)
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="metaDescription">Meta Description</Label>
+                  <Textarea
+                    id="metaDescription"
+                    value={metaDescription}
+                    onChange={(e) => setMetaDescription(e.target.value)}
+                    placeholder={excerpt || "Brief description for search engines"}
+                    rows={3}
+                    maxLength={160}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {metaDescription.length}/160 characters (defaults to excerpt)
+                  </p>
+                </div>
               </div>
 
               <Button type="submit" className="w-full">
@@ -512,6 +638,11 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         )}
+          </TabsContent>
+
+          {/* Categories Tab */}
+          <TabsContent value="categories">
+            <CategoryManager />
           </TabsContent>
 
           {/* Analytics Tab */}

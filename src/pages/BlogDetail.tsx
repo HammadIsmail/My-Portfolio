@@ -23,6 +23,9 @@ interface BlogPost {
   category: string;
   tags: string[];
   image: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  slug?: string;
 }
 
 interface Comment {
@@ -35,7 +38,7 @@ interface Comment {
 }
 
 const BlogDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [prevPost, setPrevPost] = useState<BlogPost | null>(null);
@@ -58,7 +61,8 @@ const BlogDetail = () => {
         readTime: "8 min read",
         category: "Web Development",
         tags: ["React", "Node.js", "TypeScript"],
-        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=500&fit=crop"
+        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=500&fit=crop",
+        slug: "building-scalable-web-applications-react-nodejs"
       },
       {
         id: 2,
@@ -69,7 +73,8 @@ const BlogDetail = () => {
         readTime: "10 min read",
         category: "Architecture",
         tags: ["Microservices", "Docker", "AWS"],
-        image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=800&h=500&fit=crop"
+        image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=800&h=500&fit=crop",
+        slug: "microservices-architecture-best-practices"
       },
       {
         id: 3,
@@ -80,7 +85,8 @@ const BlogDetail = () => {
         readTime: "7 min read",
         category: "Security",
         tags: ["Authentication", "Security", "OAuth"],
-        image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=500&fit=crop"
+        image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=500&fit=crop",
+        slug: "modern-authentication-strategies"
       },
       {
         id: 4,
@@ -91,7 +97,8 @@ const BlogDetail = () => {
         readTime: "6 min read",
         category: "Real-Time",
         tags: ["Socket.IO", "WebSockets", "Real-Time"],
-        image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&h=500&fit=crop"
+        image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&h=500&fit=crop",
+        slug: "building-realtime-applications-socketio"
       },
       {
         id: 5,
@@ -102,7 +109,8 @@ const BlogDetail = () => {
         readTime: "9 min read",
         category: "Database",
         tags: ["PostgreSQL", "MongoDB", "Database"],
-        image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=500&fit=crop"
+        image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=500&fit=crop",
+        slug: "database-design-sql-vs-nosql"
       },
       {
         id: 6,
@@ -113,23 +121,26 @@ const BlogDetail = () => {
         readTime: "7 min read",
         category: "Performance",
         tags: ["React", "Performance", "Optimization"],
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop"
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop",
+        slug: "optimizing-react-performance"
       }
     ];
 
     const allPosts = [...customPosts, ...defaultPosts];
-    const foundPost = allPosts.find(p => p.id.toString() === id);
+    
+    // Try to find by slug first, fallback to id for backward compatibility
+    const foundPost = allPosts.find(p => p.slug === slug || p.id.toString() === slug);
     
     if (foundPost) {
       setPost(foundPost);
       
-      // Track view count
-      const viewsKey = `post_views_${id}`;
+      // Track view count using post id
+      const viewsKey = `post_views_${foundPost.id}`;
       const currentViews = parseInt(localStorage.getItem(viewsKey) || "0");
       localStorage.setItem(viewsKey, (currentViews + 1).toString());
       
       // Find adjacent posts
-      const currentIndex = allPosts.findIndex(p => p.id.toString() === id);
+      const currentIndex = allPosts.findIndex(p => p.slug === slug || p.id.toString() === slug);
       if (currentIndex > 0) {
         setNextPost(allPosts[currentIndex - 1]);
       }
@@ -139,7 +150,7 @@ const BlogDetail = () => {
 
       // Find related posts based on matching tags or category
       const related = allPosts
-        .filter(p => p.id.toString() !== id)
+        .filter(p => (p.slug !== slug && p.id.toString() !== slug))
         .map(p => {
           let score = 0;
           if (p.category === foundPost.category) score += 3;
@@ -154,21 +165,21 @@ const BlogDetail = () => {
       
       setRelatedPosts(related);
 
-      // Load comments
+      // Load comments using post id
       const allComments = JSON.parse(localStorage.getItem("blogComments") || "[]");
-      const postComments = allComments.filter((c: Comment) => c.postId === id);
+      const postComments = allComments.filter((c: Comment) => c.postId === foundPost.id.toString());
       setComments(postComments);
     } else {
       navigate("/blog");
     }
-  }, [id, navigate]);
+  }, [slug, navigate]);
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const newComment: Comment = {
       id: Date.now().toString(),
-      postId: id!,
+      postId: post!.id.toString(),
       author: commentAuthor,
       email: commentEmail,
       content: commentContent,
@@ -195,21 +206,21 @@ const BlogDetail = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>{post.title} | Blog</title>
-        <meta name="description" content={post.excerpt} />
+        <title>{post.metaTitle || post.title} | Blog</title>
+        <meta name="description" content={post.metaDescription || post.excerpt} />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="article" />
         <meta property="og:url" content={currentUrl} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:title" content={post.metaTitle || post.title} />
+        <meta property="og:description" content={post.metaDescription || post.excerpt} />
         <meta property="og:image" content={post.image} />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:url" content={currentUrl} />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
+        <meta name="twitter:title" content={post.metaTitle || post.title} />
+        <meta name="twitter:description" content={post.metaDescription || post.excerpt} />
         <meta name="twitter:image" content={post.image} />
       </Helmet>
       
@@ -284,7 +295,7 @@ const BlogDetail = () => {
               <h2 className="text-2xl font-bold mb-6">Related Posts</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {relatedPosts.map((relatedPost) => (
-                  <Link key={relatedPost.id} to={`/blog/${relatedPost.id}`}>
+                  <Link key={relatedPost.id} to={`/blog/${relatedPost.slug || relatedPost.id}`}>
                     <Card className="group hover:shadow-lg transition-all duration-300 h-full">
                       <div className="relative h-32 overflow-hidden">
                         <img 
@@ -402,7 +413,7 @@ const BlogDetail = () => {
           {/* Navigation */}
           <div className="flex justify-between items-center pt-8 border-t">
             {prevPost ? (
-              <Link to={`/blog/${prevPost.id}`}>
+              <Link to={`/blog/${prevPost.slug || prevPost.id}`}>
                 <Button variant="outline">
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Previous Post
@@ -412,7 +423,7 @@ const BlogDetail = () => {
               <div />
             )}
             {nextPost ? (
-              <Link to={`/blog/${nextPost.id}`}>
+              <Link to={`/blog/${nextPost.slug || nextPost.id}`}>
                 <Button variant="outline">
                   Next Post
                   <ChevronRight className="w-4 h-4 ml-2" />
