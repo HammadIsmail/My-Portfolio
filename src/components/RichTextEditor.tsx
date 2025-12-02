@@ -19,9 +19,11 @@ import {
   List, ListOrdered, Quote, Minus, Undo, Redo,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
   Image as ImageIcon, Link as LinkIcon, Table as TableIcon,
-  Heading1, Heading2, Heading3, Highlighter, Type, Trash2
+  Heading1, Heading2, Heading3, Highlighter, Type, Trash2, ImagePlus
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import MediaLibrary from './MediaLibrary';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -39,10 +41,12 @@ interface RichTextEditorProps {
 const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [imageAlignment, setImageAlignment] = useState<'left' | 'center' | 'right'>('center');
+  const [isDragging, setIsDragging] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -149,6 +153,51 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     }
   };
 
+  const handleMediaLibrarySelect = (url: string) => {
+    editor.chain().focus().setImage({ src: url }).run();
+    toast.success('Image inserted from library');
+  };
+
+  const saveToMediaLibrary = (url: string) => {
+    const mediaItems = JSON.parse(localStorage.getItem('mediaLibrary') || '[]');
+    const newItem = {
+      id: Date.now().toString(),
+      url,
+      name: url.split('/').pop() || 'Image',
+      addedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('mediaLibrary', JSON.stringify([newItem, ...mediaItems]));
+  };
+
+  const handleDrop = useCallback((event: DragEvent) => {
+    event.preventDefault();
+    setIsDragging(false);
+
+    if (!editor) return;
+
+    const files = event.dataTransfer?.files;
+    const imageUrl = event.dataTransfer?.getData('text/uri-list') || event.dataTransfer?.getData('text/plain');
+
+    if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
+      // URL was dropped
+      editor.chain().focus().setImage({ src: imageUrl }).run();
+      saveToMediaLibrary(imageUrl);
+      toast.success('Image added to editor and library');
+    } else if (files && files.length > 0) {
+      // File was dropped - show message
+      toast.info('Convert image to URL or upload to a hosting service, then drag the URL');
+    }
+  }, [editor]);
+
+  const handleDragOver = useCallback((event: DragEvent) => {
+    event.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
   const ToolbarButton = ({ 
     onClick, 
     isActive, 
@@ -173,7 +222,24 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
   );
 
   return (
-    <div className="border rounded-lg overflow-hidden bg-background">
+    <div 
+      className={`border rounded-lg overflow-hidden bg-background transition-all ${
+        isDragging ? 'ring-2 ring-primary ring-offset-2' : ''
+      }`}
+      onDrop={handleDrop as any}
+      onDragOver={handleDragOver as any}
+      onDragLeave={handleDragLeave}
+    >
+      {isDragging && (
+        <div className="absolute inset-0 bg-primary/10 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-background p-6 rounded-lg shadow-lg border-2 border-primary border-dashed">
+            <ImagePlus className="w-12 h-12 mx-auto mb-2 text-primary" />
+            <p className="text-lg font-semibold">Drop image here</p>
+            <p className="text-sm text-muted-foreground">Image will be added to editor and library</p>
+          </div>
+        </div>
+      )}
+      
       {/* Toolbar */}
       <div className="border-b bg-muted/30">
         {/* Main Formatting Row */}
@@ -335,9 +401,16 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
 
           <ToolbarButton
             onClick={() => setImageDialogOpen(true)}
-            title="Add Image"
+            title="Add Image by URL"
           >
             <ImageIcon className="h-4 w-4" />
+          </ToolbarButton>
+
+          <ToolbarButton
+            onClick={() => setMediaLibraryOpen(true)}
+            title="Choose from Media Library"
+          >
+            <ImagePlus className="h-4 w-4" />
           </ToolbarButton>
 
           <ToolbarButton
@@ -444,6 +517,13 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Media Library */}
+      <MediaLibrary
+        open={mediaLibraryOpen}
+        onOpenChange={setMediaLibraryOpen}
+        onSelect={handleMediaLibrarySelect}
+      />
     </div>
   );
 };

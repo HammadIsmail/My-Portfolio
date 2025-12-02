@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,13 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RichTextEditor from "@/components/RichTextEditor";
 import MarkdownEditor from "@/components/MarkdownEditor";
-import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp } from "lucide-react";
+import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { Calendar, Clock } from "lucide-react";
 
 interface BlogPost {
   id: string;
@@ -34,6 +36,9 @@ const AdminDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [editorMode, setEditorMode] = useState<"rich" | "markdown">("rich");
   const [activeTab, setActiveTab] = useState("posts");
+  const [previewMode, setPreviewMode] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -52,7 +57,36 @@ const AdminDashboard = () => {
     
     // Load posts
     loadPosts();
-  }, [navigate]);
+
+    // Load draft on mount if editing
+    if (showForm) {
+      loadDraft();
+    }
+  }, [navigate, showForm]);
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (!showForm || (!title && !content && !excerpt)) {
+      return;
+    }
+
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // Set new timer for auto-save after 3 seconds of inactivity
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveDraft();
+    }, 3000);
+
+    // Cleanup
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [title, excerpt, content, category, tags, image, readTime, showForm]);
 
   const loadPosts = () => {
     const existingPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
@@ -130,6 +164,42 @@ const AdminDashboard = () => {
     resetForm();
   };
 
+  const saveDraft = () => {
+    const draft = {
+      title,
+      excerpt,
+      content,
+      category,
+      tags,
+      image,
+      readTime,
+      editingPostId: editingPost?.id,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('blogPostDraft', JSON.stringify(draft));
+    setLastSaved(new Date());
+  };
+
+  const loadDraft = () => {
+    const draftStr = localStorage.getItem('blogPostDraft');
+    if (draftStr) {
+      const draft = JSON.parse(draftStr);
+      const savedTime = new Date(draft.savedAt);
+      const now = new Date();
+      const diffMinutes = (now.getTime() - savedTime.getTime()) / 1000 / 60;
+
+      // Only load if draft is less than 24 hours old
+      if (diffMinutes < 1440) {
+        setLastSaved(savedTime);
+      }
+    }
+  };
+
+  const clearDraft = () => {
+    localStorage.removeItem('blogPostDraft');
+    setLastSaved(null);
+  };
+
   const resetForm = () => {
     setTitle("");
     setExcerpt("");
@@ -140,6 +210,8 @@ const AdminDashboard = () => {
     setReadTime("");
     setEditingPost(null);
     setShowForm(false);
+    setPreviewMode(false);
+    clearDraft();
   };
 
   // Analytics calculations
@@ -275,13 +347,78 @@ const AdminDashboard = () => {
                 <CardDescription>
                   Fill in the details below to {editingPost ? "update" : "create"} a blog post
                 </CardDescription>
+                {lastSaved && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
+                    <Save className="w-3 h-3" />
+                    <span>Auto-saved {new Date(lastSaved).toLocaleTimeString()}</span>
+                  </div>
+                )}
               </div>
-              <Button variant="outline" onClick={resetForm}>
-                Cancel
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setPreviewMode(!previewMode)}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  {previewMode ? "Edit" : "Preview"}
+                </Button>
+                <Button variant="outline" onClick={resetForm}>
+                  Cancel
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
+            {previewMode ? (
+              /* Preview Mode */
+              <div className="space-y-6">
+                <div className="relative h-64 sm:h-96 rounded-xl overflow-hidden">
+                  <img 
+                    src={image || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=800"} 
+                    alt={title || "Preview"}
+                    className="w-full h-full object-cover"
+                  />
+                  {category && (
+                    <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+                      {category}
+                    </Badge>
+                  )}
+                </div>
+
+                <header className="space-y-4">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+                    {title || "Untitled Post"}
+                  </h1>
+                  
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      <span>{readTime || "5 min read"}</span>
+                    </div>
+                  </div>
+
+                  {tags && (
+                    <div className="flex flex-wrap gap-2">
+                      {tags.split(",").map((tag, index) => (
+                        <Badge key={index} variant="secondary">
+                          {tag.trim()}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </header>
+
+                <div className="prose prose-lg max-w-none">
+                  <p className="text-xl text-muted-foreground">{excerpt || "No excerpt provided"}</p>
+                  <div dangerouslySetInnerHTML={{ __html: content || "<p>No content yet</p>" }} />
+                </div>
+              </div>
+            ) : (
+              /* Edit Mode */
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Title *</Label>
@@ -371,6 +508,7 @@ const AdminDashboard = () => {
                 {editingPost ? "Update" : "Create"} Blog Post
               </Button>
             </form>
+            )}
           </CardContent>
         </Card>
         )}
