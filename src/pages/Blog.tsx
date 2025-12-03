@@ -7,6 +7,7 @@ import { Calendar, Clock, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BlogFilters from "@/components/BlogFilters";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Pagination,
   PaginationContent,
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/pagination";
 
 interface BlogPost {
-  id: number | string;
+  id: string;
   title: string;
   excerpt: string;
   content?: string;
@@ -27,12 +28,12 @@ interface BlogPost {
   category: string;
   tags: string[];
   image: string;
-  slug?: string;
+  slug: string;
 }
 
-const blogPosts: BlogPost[] = [
+const defaultPosts: BlogPost[] = [
   {
-    id: 1,
+    id: "1",
     title: "Building Scalable Web Applications with React and Node.js",
     excerpt: "Learn how to architect and build production-ready web applications using modern technologies like React, Node.js, and TypeScript.",
     date: "2025-01-15",
@@ -43,7 +44,7 @@ const blogPosts: BlogPost[] = [
     slug: "building-scalable-web-applications-react-nodejs"
   },
   {
-    id: 2,
+    id: "2",
     title: "Microservices Architecture: Best Practices and Patterns",
     excerpt: "Explore the world of microservices architecture, including communication patterns, deployment strategies, and common pitfalls to avoid.",
     date: "2025-01-10",
@@ -54,7 +55,7 @@ const blogPosts: BlogPost[] = [
     slug: "microservices-architecture-best-practices"
   },
   {
-    id: 3,
+    id: "3",
     title: "Modern Authentication Strategies for Web Applications",
     excerpt: "Deep dive into authentication and authorization patterns including JWT, OAuth 2.0, and session management best practices.",
     date: "2025-01-05",
@@ -64,55 +65,52 @@ const blogPosts: BlogPost[] = [
     image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800&h=500&fit=crop",
     slug: "modern-authentication-strategies"
   },
-  {
-    id: 4,
-    title: "Building Real-Time Applications with Socket.IO",
-    excerpt: "Create engaging real-time features like chat, notifications, and live updates using Socket.IO and WebSockets.",
-    date: "2024-12-28",
-    readTime: "6 min read",
-    category: "Real-Time",
-    tags: ["Socket.IO", "WebSockets", "Real-Time"],
-    image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&h=500&fit=crop",
-    slug: "building-realtime-applications-socketio"
-  },
-  {
-    id: 5,
-    title: "Database Design: SQL vs NoSQL - Making the Right Choice",
-    excerpt: "Understanding when to use SQL databases like PostgreSQL versus NoSQL solutions like MongoDB for your application.",
-    date: "2024-12-20",
-    readTime: "9 min read",
-    category: "Database",
-    tags: ["PostgreSQL", "MongoDB", "Database"],
-    image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&h=500&fit=crop",
-    slug: "database-design-sql-vs-nosql"
-  },
-  {
-    id: 6,
-    title: "Optimizing React Performance: Tips and Tricks",
-    excerpt: "Practical techniques to optimize React applications including code splitting, lazy loading, and memoization strategies.",
-    date: "2024-12-15",
-    readTime: "7 min read",
-    category: "Performance",
-    tags: ["React", "Performance", "Optimization"],
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop",
-    slug: "optimizing-react-performance"
-  }
 ];
 
 const POSTS_PER_PAGE = 12;
 
 const Blog = () => {
-  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(defaultPosts);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Load custom posts from localStorage
-    const customPosts = JSON.parse(localStorage.getItem("blogPosts") || "[]");
-    setAllPosts([...customPosts, ...blogPosts]);
+    loadPosts();
   }, []);
+
+  const loadPosts = async () => {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select(`
+        *,
+        categories (name)
+      `)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
+    
+    if (!error && data) {
+      const dbPosts: BlogPost[] = data.map(post => ({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt || '',
+        content: post.content,
+        date: post.created_at.split('T')[0],
+        readTime: '5 min read',
+        category: post.categories?.name || 'Uncategorized',
+        tags: [],
+        image: post.cover_image || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=800',
+        slug: post.slug
+      }));
+      setAllPosts([...dbPosts, ...defaultPosts]);
+    } else {
+      setAllPosts(defaultPosts);
+    }
+    setIsLoading(false);
+  };
 
   // Extract unique categories and tags
   const categories = useMemo(() => {
@@ -159,6 +157,18 @@ const Blog = () => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, selectedTag]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 pt-20 sm:pt-24 pb-12 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -204,7 +214,7 @@ const Blog = () => {
           <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {paginatedPosts.map((post) => (
-              <Link key={post.id} to={`/blog/${post.slug || post.id}`}>
+              <Link key={post.id} to={`/blog/${post.slug}`}>
                 <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
                 <div className="relative h-48 overflow-hidden">
                   <img 
@@ -264,7 +274,6 @@ const Blog = () => {
                   </PaginationItem>
                   
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                    // Show first page, last page, current page, and pages around current
                     const showPage = 
                       page === 1 || 
                       page === totalPages || 
