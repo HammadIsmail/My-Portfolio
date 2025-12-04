@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Link, Loader2, X } from "lucide-react";
+import { Upload, Link, Loader2, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import MediaLibrary from "./MediaLibrary";
 
 interface ImageUploadProps {
   value: string;
@@ -15,20 +16,19 @@ interface ImageUploadProps {
 
 const ImageUpload = ({ value, onChange, label = "Cover Image" }: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadTab, setUploadTab] = useState<"upload" | "url">("upload");
+  const [uploadTab, setUploadTab] = useState<"upload" | "url" | "library">("upload");
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image must be less than 5MB");
       return;
@@ -50,13 +50,18 @@ const ImageUpload = ({ value, onChange, label = "Cover Image" }: ImageUploadProp
         .from("blog-images")
         .upload(fileName, file);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       const { data: publicUrl } = supabase.storage
         .from("blog-images")
         .getPublicUrl(data.path);
+
+      // Also save to media library
+      await supabase.from('media_library').insert({
+        user_id: user.id,
+        url: publicUrl.publicUrl,
+        name: file.name,
+      });
 
       onChange(publicUrl.publicUrl);
       toast.success("Image uploaded successfully");
@@ -73,6 +78,11 @@ const ImageUpload = ({ value, onChange, label = "Cover Image" }: ImageUploadProp
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const handleMediaSelect = (url: string) => {
+    onChange(url);
+    setMediaLibraryOpen(false);
   };
 
   return (
@@ -97,11 +107,15 @@ const ImageUpload = ({ value, onChange, label = "Cover Image" }: ImageUploadProp
           </Button>
         </div>
       ) : (
-        <Tabs value={uploadTab} onValueChange={(v) => setUploadTab(v as "upload" | "url")}>
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs value={uploadTab} onValueChange={(v) => setUploadTab(v as "upload" | "url" | "library")}>
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="upload">
               <Upload className="h-4 w-4 mr-2" />
               Upload
+            </TabsTrigger>
+            <TabsTrigger value="library">
+              <ImageIcon className="h-4 w-4 mr-2" />
+              Library
             </TabsTrigger>
             <TabsTrigger value="url">
               <Link className="h-4 w-4 mr-2" />
@@ -140,6 +154,21 @@ const ImageUpload = ({ value, onChange, label = "Cover Image" }: ImageUploadProp
               />
             </div>
           </TabsContent>
+
+          <TabsContent value="library" className="mt-4">
+            <div
+              className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => setMediaLibraryOpen(true)}
+            >
+              <ImageIcon className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Browse your media library
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Select from previously uploaded images
+              </p>
+            </div>
+          </TabsContent>
           
           <TabsContent value="url" className="mt-4">
             <Input
@@ -149,6 +178,12 @@ const ImageUpload = ({ value, onChange, label = "Cover Image" }: ImageUploadProp
           </TabsContent>
         </Tabs>
       )}
+
+      <MediaLibrary
+        open={mediaLibraryOpen}
+        onOpenChange={setMediaLibraryOpen}
+        onSelect={handleMediaSelect}
+      />
     </div>
   );
 };

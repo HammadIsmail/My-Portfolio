@@ -1,16 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Card, CardContent } from '@/components/ui/card';
-import { Trash2, Upload, Check, Search, Loader2, Image as ImageIcon, Link } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trash2, Upload, Search, Loader2, Image as ImageIcon, Link, Copy, Check } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,26 +14,18 @@ interface MediaItem {
   created_at: string;
 }
 
-interface MediaLibraryProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSelect: (url: string) => void;
-}
-
-const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
+const MediaLibraryTab = () => {
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (open) {
-      loadMedia();
-    }
-  }, [open]);
+    loadMedia();
+  }, []);
 
   const loadMedia = async () => {
     setIsLoading(true);
@@ -99,7 +83,6 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
           .from("blog-images")
           .getPublicUrl(uploadData.path);
 
-        // Save to media_library table
         const { error: dbError } = await supabase
           .from('media_library')
           .insert({
@@ -151,7 +134,6 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
   };
 
   const deleteImage = async (item: MediaItem) => {
-    // Try to delete from storage if it's a Supabase storage URL
     if (item.url.includes('blog-images')) {
       const path = item.url.split('blog-images/')[1];
       if (path) {
@@ -169,18 +151,14 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
     } else {
       toast.success('Image removed from library');
       setMediaItems(mediaItems.filter(m => m.id !== item.id));
-      if (selectedImage === item.url) {
-        setSelectedImage(null);
-      }
     }
   };
 
-  const handleSelect = () => {
-    if (selectedImage) {
-      onSelect(selectedImage);
-      onOpenChange(false);
-      setSelectedImage(null);
-    }
+  const copyToClipboard = async (url: string, id: string) => {
+    await navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    toast.success('URL copied to clipboard');
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const filteredItems = mediaItems.filter(item =>
@@ -188,21 +166,20 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
   );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Media Library</DialogTitle>
-          <DialogDescription>
-            Upload images or select from your library
-          </DialogDescription>
-        </DialogHeader>
-
+    <Card>
+      <CardHeader>
+        <CardTitle>Media Library</CardTitle>
+        <CardDescription>
+          Upload and manage images for your blog posts. {mediaItems.length} image{mediaItems.length !== 1 ? 's' : ''} in library.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
         {/* Upload Section */}
         <Tabs defaultValue="upload" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upload">
               <Upload className="h-4 w-4 mr-2" />
-              Upload
+              Upload Files
             </TabsTrigger>
             <TabsTrigger value="url">
               <Link className="h-4 w-4 mr-2" />
@@ -212,7 +189,7 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
           
           <TabsContent value="upload" className="mt-4">
             <div
-              className="border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+              className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               {isUploading ? (
@@ -222,10 +199,8 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
                 </div>
               ) : (
                 <>
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    Click to upload or drag and drop
-                  </p>
+                  <Upload className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-sm font-medium">Click to upload or drag and drop</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     PNG, JPG, GIF up to 5MB (multiple files supported)
                   </p>
@@ -251,6 +226,7 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
                 placeholder="https://example.com/image.jpg"
               />
               <Button onClick={addImageByUrl} disabled={!newImageUrl}>
+                <Link className="h-4 w-4 mr-2" />
                 Add
               </Button>
             </div>
@@ -263,85 +239,76 @@ const MediaLibrary = ({ open, onOpenChange, onSelect }: MediaLibraryProps) => {
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search images..."
+            placeholder="Search images by name..."
             className="pl-10"
           />
         </div>
 
         {/* Image Grid */}
-        <div className="flex-1 overflow-y-auto min-h-[200px]">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : filteredItems.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>{searchQuery ? 'No images found matching your search' : 'No images in library yet'}</p>
-              <p className="text-sm">Upload images to get started</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-              {filteredItems.map((item) => (
-                <Card
-                  key={item.id}
-                  className={`relative group cursor-pointer transition-all hover:shadow-md ${
-                    selectedImage === item.url ? 'ring-2 ring-primary' : ''
-                  }`}
-                  onClick={() => setSelectedImage(item.url)}
-                >
-                  <CardContent className="p-1.5">
-                    <div className="relative aspect-square overflow-hidden rounded">
-                      <img
-                        src={item.url}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      {selectedImage === item.url && (
-                        <div className="absolute inset-0 bg-primary/30 flex items-center justify-center">
-                          <Check className="w-6 h-6 text-primary-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 truncate" title={item.name}>
-                      {item.name}
-                    </p>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteImage(item);
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-between items-center pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
-            {filteredItems.length} image{filteredItems.length !== 1 ? 's' : ''}
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSelect} disabled={!selectedImage}>
-              Insert Selected
-            </Button>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        ) : filteredItems.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground border rounded-lg">
+            <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="font-medium">{searchQuery ? 'No images found' : 'No images yet'}</p>
+            <p className="text-sm">{searchQuery ? 'Try a different search term' : 'Upload images to get started'}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {filteredItems.map((item) => (
+              <div
+                key={item.id}
+                className="group relative border rounded-lg overflow-hidden hover:shadow-md transition-all"
+              >
+                <div className="aspect-square overflow-hidden bg-muted">
+                  <img
+                    src={item.url}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-2">
+                  <p className="text-xs text-muted-foreground truncate" title={item.name}>
+                    {item.name}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/70">
+                    {new Date(item.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={() => copyToClipboard(item.url, item.id)}
+                    title="Copy URL"
+                  >
+                    {copiedId === item.id ? (
+                      <Check className="w-3 h-3" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="h-7 w-7 p-0"
+                    onClick={() => deleteImage(item)}
+                    title="Delete"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
-export default MediaLibrary;
+export default MediaLibraryTab;
