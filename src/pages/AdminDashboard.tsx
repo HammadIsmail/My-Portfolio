@@ -13,10 +13,12 @@ import Footer from "@/components/Footer";
 import RichTextEditor from "@/components/RichTextEditor";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import CategoryManager from "@/components/CategoryManager";
-import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save, Tag } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
+import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save, Tag, CalendarClock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Calendar, Clock } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -34,6 +36,7 @@ interface BlogPost {
   metaDescription?: string;
   slug?: string;
   status?: string;
+  scheduledAt?: string | null;
 }
 
 interface Category {
@@ -66,6 +69,8 @@ const AdminDashboard = () => {
   const [metaDescription, setMetaDescription] = useState("");
   const [slug, setSlug] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [postStatus, setPostStatus] = useState<"draft" | "published" | "scheduled">("draft");
+  const [scheduledAt, setScheduledAt] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -150,7 +155,8 @@ const AdminDashboard = () => {
         metaTitle: post.meta_title || '',
         metaDescription: post.meta_description || '',
         slug: post.slug,
-        status: post.status
+        status: post.status,
+        scheduledAt: (post as any).scheduled_at
       }));
       setPosts(formattedPosts);
     }
@@ -175,6 +181,8 @@ const AdminDashboard = () => {
     setMetaTitle(post.metaTitle || "");
     setMetaDescription(post.metaDescription || "");
     setSlug(post.slug || "");
+    setPostStatus((post.status as "draft" | "published" | "scheduled") || "draft");
+    setScheduledAt(post.scheduledAt ? new Date(post.scheduledAt).toISOString().slice(0, 16) : "");
     setShowForm(true);
   };
 
@@ -202,8 +210,17 @@ const AdminDashboard = () => {
       return;
     }
 
+    if (postStatus === "scheduled" && !scheduledAt) {
+      toast.error("Please select a scheduled date and time");
+      return;
+    }
+
     // Find category id
     const selectedCategory = categories.find(c => c.name === category);
+    
+    const finalStatus = postStatus === "scheduled" ? "scheduled" : postStatus;
+    const finalScheduledAt = postStatus === "scheduled" ? new Date(scheduledAt).toISOString() : null;
+    const finalPublishedAt = postStatus === "published" ? new Date().toISOString() : null;
 
     if (editingPost) {
       const { error } = await supabase
@@ -217,8 +234,10 @@ const AdminDashboard = () => {
           category_id: selectedCategory?.id || null,
           meta_title: metaTitle || title,
           meta_description: metaDescription || excerpt,
-          status: 'published',
-        })
+          status: finalStatus,
+          scheduled_at: finalScheduledAt,
+          published_at: finalPublishedAt,
+        } as any)
         .eq('id', editingPost.id);
 
       if (error) {
@@ -241,8 +260,10 @@ const AdminDashboard = () => {
           author_id: user!.id,
           meta_title: metaTitle || title,
           meta_description: metaDescription || excerpt,
-          status: 'published',
-        });
+          status: finalStatus,
+          scheduled_at: finalScheduledAt,
+          published_at: finalPublishedAt,
+        } as any);
 
       if (error) {
         if (error.message.includes('duplicate')) {
@@ -293,6 +314,8 @@ const AdminDashboard = () => {
     setMetaTitle("");
     setMetaDescription("");
     setSlug("");
+    setPostStatus("draft");
+    setScheduledAt("");
     setEditingPost(null);
     setShowForm(false);
     setPreviewMode(false);
@@ -397,8 +420,13 @@ const AdminDashboard = () => {
                             <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{post.excerpt}</p>
                             <div className="flex flex-wrap gap-2 mb-2">
                               {post.category && <Badge variant="outline">{post.category}</Badge>}
-                              <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                                {post.status || 'draft'}
+                              <Badge variant={
+                                post.status === 'published' ? 'default' : 
+                                post.status === 'scheduled' ? 'secondary' : 'outline'
+                              }>
+                                {post.status === 'scheduled' && post.scheduledAt 
+                                  ? `Scheduled: ${new Date(post.scheduledAt).toLocaleDateString()} ${new Date(post.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                  : post.status || 'draft'}
                               </Badge>
                             </div>
                             <p className="text-xs text-muted-foreground">{post.date}</p>
@@ -583,26 +611,66 @@ const AdminDashboard = () => {
                         )}
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="image">Cover Image URL</Label>
-                          <Input
-                            id="image"
-                            value={image}
-                            onChange={(e) => setImage(e.target.value)}
-                            placeholder="https://example.com/image.jpg"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="tags">Tags (comma separated)</Label>
-                          <Input
-                            id="tags"
-                            value={tags}
-                            onChange={(e) => setTags(e.target.value)}
-                            placeholder="react, typescript, web dev"
-                          />
-                        </div>
+                      <ImageUpload value={image} onChange={setImage} />
+
+                      <div className="space-y-2">
+                        <Label htmlFor="tags">Tags (comma separated)</Label>
+                        <Input
+                          id="tags"
+                          value={tags}
+                          onChange={(e) => setTags(e.target.value)}
+                          placeholder="react, typescript, web dev"
+                        />
                       </div>
+
+                      {/* Publishing Options */}
+                      <Card className="border-dashed">
+                        <CardHeader>
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <CalendarClock className="h-5 w-5" />
+                            Publishing Options
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                              <Label>Post Status</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Choose when to publish this post
+                              </p>
+                            </div>
+                            <Select 
+                              value={postStatus} 
+                              onValueChange={(v) => setPostStatus(v as "draft" | "published" | "scheduled")}
+                            >
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="draft">Draft</SelectItem>
+                                <SelectItem value="published">Publish Now</SelectItem>
+                                <SelectItem value="scheduled">Schedule</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          {postStatus === "scheduled" && (
+                            <div className="space-y-2">
+                              <Label htmlFor="scheduledAt">Schedule Date & Time</Label>
+                              <Input
+                                id="scheduledAt"
+                                type="datetime-local"
+                                value={scheduledAt}
+                                onChange={(e) => setScheduledAt(e.target.value)}
+                                min={new Date().toISOString().slice(0, 16)}
+                              />
+                              <p className="text-xs text-muted-foreground">
+                                Post will be automatically published at the scheduled time
+                              </p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
 
                       <Card className="border-dashed">
                         <CardHeader>
@@ -636,7 +704,13 @@ const AdminDashboard = () => {
                       </Card>
 
                       <Button type="submit" className="w-full">
-                        {editingPost ? "Update Post" : "Create Post"}
+                        {postStatus === "scheduled" 
+                          ? "Schedule Post" 
+                          : postStatus === "draft" 
+                            ? "Save as Draft" 
+                            : editingPost 
+                              ? "Update Post" 
+                              : "Publish Post"}
                       </Button>
                     </form>
                   )}

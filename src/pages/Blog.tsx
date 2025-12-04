@@ -83,13 +83,16 @@ const Blog = () => {
 
   const loadPosts = async () => {
     setIsLoading(true);
+    const now = new Date().toISOString();
+    
+    // Fetch published posts and scheduled posts that have passed their scheduled time
     const { data, error } = await supabase
       .from('blog_posts')
       .select(`
         *,
         categories (name)
       `)
-      .eq('status', 'published')
+      .or(`status.eq.published,and(status.eq.scheduled,scheduled_at.lte.${now})`)
       .order('created_at', { ascending: false });
     
     if (!error && data) {
