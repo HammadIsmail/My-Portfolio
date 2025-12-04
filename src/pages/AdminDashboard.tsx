@@ -14,7 +14,8 @@ import RichTextEditor from "@/components/RichTextEditor";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import CategoryManager from "@/components/CategoryManager";
 import ImageUpload from "@/components/ImageUpload";
-import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save, Tag, CalendarClock } from "lucide-react";
+import MediaLibraryTab from "@/components/MediaLibraryTab";
+import { Pencil, Trash2, Plus, BarChart3, Eye, TrendingUp, Save, Tag, CalendarClock, Image as ImageIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Calendar, Clock } from "lucide-react";
@@ -384,6 +385,10 @@ const AdminDashboard = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="posts">Blog Posts</TabsTrigger>
+            <TabsTrigger value="media">
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Media
+            </TabsTrigger>
             <TabsTrigger value="categories">
               <Tag className="w-4 h-4 mr-2" />
               Categories
@@ -717,6 +722,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Media Tab */}
+          <TabsContent value="media">
+            <MediaLibraryTab />
           </TabsContent>
 
           {/* Categories Tab */}
