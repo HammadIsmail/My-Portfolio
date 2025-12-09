@@ -1,9 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useEffect, useState, useRef } from "react";
 
 const Projects = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   const projects = [
     {
@@ -78,8 +89,15 @@ const Projects = () => {
     }
   ];
 
+  const getParallaxOffset = (index: number) => {
+    if (!sectionRef.current) return 0;
+    const sectionTop = sectionRef.current.offsetTop;
+    const relativeScroll = scrollY - sectionTop;
+    return relativeScroll * 0.15 * (index % 2 === 0 ? 1 : -1);
+  };
+
   return (
-    <section id="projects" className="py-12 sm:py-16 lg:py-20 bg-background">
+    <section ref={sectionRef} id="projects" className="py-12 sm:py-16 lg:py-20 bg-background">
       <div className="container mx-auto px-4 sm:px-6">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Projects</h2>
         <div ref={ref} className="relative">
@@ -126,11 +144,14 @@ const Projects = () => {
                       </Button>
                     </div>
                   </div>
-                  <div className={`relative aspect-[4/3] lg:aspect-auto ${project.imagePosition === 'left' ? 'lg:col-start-1 lg:row-start-1' : ''}`}>
+                  <div className={`relative aspect-[4/3] lg:aspect-auto overflow-hidden ${project.imagePosition === 'left' ? 'lg:col-start-1 lg:row-start-1' : ''}`}>
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-100 ease-out"
+                      style={{
+                        transform: `translateY(${getParallaxOffset(index)}px) scale(1.1)`
+                      }}
                     />
                   </div>
                 </div>
