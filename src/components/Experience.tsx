@@ -1,4 +1,4 @@
-import { Briefcase, MapPin, Calendar } from "lucide-react";
+import { MapPin, Calendar } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Experience = () => {
@@ -42,45 +42,57 @@ const Experience = () => {
           Experience
         </h2>
 
-        <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+        <div className="max-w-4xl mx-auto relative">
           {experiences.map((exp, index) => (
             <div
               key={index}
-              className={`bg-card rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-700 border border-border ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}
-              style={{ transitionDelay: `${index * 150}ms` }}
+              className="sticky top-20"
+              style={{ 
+                zIndex: index + 1,
+                paddingBottom: index === experiences.length - 1 ? '0' : '1.5rem'
+              }}
             >
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
-                    {exp.role}
-                  </h3>
-                  <p className="text-lg sm:text-xl font-semibold text-primary mb-2">
-                    {exp.company}
-                  </p>
+              <div
+                className={`bg-card rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-700 border border-border ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                }`}
+                style={{ 
+                  transitionDelay: `${index * 150}ms`,
+                  transform: isVisible ? `scale(${1 - index * 0.02})` : 'translateY(40px)',
+                  transformOrigin: 'top center'
+                }}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
+                      {exp.role}
+                    </h3>
+                    <p className="text-lg sm:text-xl font-semibold text-primary mb-2">
+                      {exp.company}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
+                    <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                      {exp.workType}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
-                  <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                    {exp.workType}
-                  </span>
-                </div>
-              </div>
 
-              <div className="flex flex-wrap gap-3 sm:gap-4 mb-4 text-sm sm:text-base text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>{exp.location}</span>
+                <div className="flex flex-wrap gap-3 sm:gap-4 mb-4 text-sm sm:text-base text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{exp.location}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>{exp.period}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span>{exp.period}</span>
-                </div>
-              </div>
 
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                {exp.description}
-              </p>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                  {exp.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
