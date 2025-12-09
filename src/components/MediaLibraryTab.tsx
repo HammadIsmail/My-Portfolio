@@ -47,6 +47,12 @@ const MediaLibraryTab = () => {
   const [crop, setCrop] = useState<CropType>();
   const [resizeScale, setResizeScale] = useState(100);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState<number | undefined>(undefined);
+  
+  // Filter state
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
@@ -95,6 +101,10 @@ const MediaLibraryTab = () => {
       setIsCropMode(false);
       setCrop(undefined);
       setResizeScale(100);
+      setAspectRatio(undefined);
+      setBrightness(100);
+      setContrast(100);
+      setSaturation(100);
     }
   }, [previewItem]);
 
@@ -335,16 +345,56 @@ const MediaLibraryTab = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // Aspect ratio presets
+  const aspectRatioPresets = [
+    { label: 'Free', value: undefined },
+    { label: '16:9', value: 16 / 9 },
+    { label: '4:3', value: 4 / 3 },
+    { label: '1:1', value: 1 },
+    { label: '3:4', value: 3 / 4 },
+    { label: '9:16', value: 9 / 16 },
+    { label: '2:1', value: 2 },
+    { label: '21:9', value: 21 / 9 },
+  ];
+
   // Crop/resize handlers
   const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
+    const ratio = aspectRatio || 16 / 9;
     const crop = centerCrop(
-      makeAspectCrop({ unit: '%', width: 90 }, 16 / 9, width, height),
+      makeAspectCrop({ unit: '%', width: 90 }, ratio, width, height),
       width,
       height
     );
     setCrop(crop);
   };
+
+  const handleAspectRatioChange = (ratio: number | undefined) => {
+    setAspectRatio(ratio);
+    if (cropImageRef.current && isCropMode) {
+      const { width, height } = cropImageRef.current;
+      if (ratio) {
+        const crop = centerCrop(
+          makeAspectCrop({ unit: '%', width: 80 }, ratio, width, height),
+          width,
+          height
+        );
+        setCrop(crop);
+      }
+    }
+  };
+
+  const resetFilters = () => {
+    setBrightness(100);
+    setContrast(100);
+    setSaturation(100);
+  };
+
+  const hasFilterChanges = brightness !== 100 || contrast !== 100 || saturation !== 100;
+  
+  const getFilterStyle = () => ({
+    filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`,
+  });
 
   const getCroppedImage = async (): Promise<Blob | null> => {
     if (!cropImageRef.current || !previewItem) return null;
@@ -376,6 +426,9 @@ const MediaLibraryTab = () => {
 
     canvas.width = outputWidth;
     canvas.height = outputHeight;
+
+    // Apply filters
+    ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
 
     ctx.drawImage(
       image,
@@ -734,6 +787,7 @@ const MediaLibraryTab = () => {
                   <ReactCrop
                     crop={crop}
                     onChange={(_, percentCrop) => setCrop(percentCrop)}
+                    aspect={aspectRatio}
                     className="max-h-[60vh]"
                   >
                     <img
@@ -742,6 +796,7 @@ const MediaLibraryTab = () => {
                       alt={previewItem.name}
                       onLoad={onImageLoad}
                       className="max-w-full max-h-[60vh] object-contain"
+                      style={getFilterStyle()}
                       crossOrigin="anonymous"
                     />
                   </ReactCrop>
@@ -751,6 +806,7 @@ const MediaLibraryTab = () => {
                     src={previewItem.url}
                     alt={previewItem.name}
                     className="max-w-full max-h-[60vh] object-contain"
+                    style={getFilterStyle()}
                     crossOrigin="anonymous"
                   />
                 )}
@@ -819,12 +875,33 @@ const MediaLibraryTab = () => {
                         onClick={() => {
                           setIsCropMode(false);
                           setCrop(undefined);
+                          setAspectRatio(undefined);
                         }}
                       >
                         <RotateCcw className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
+
+                  {/* Aspect Ratio Presets */}
+                  {isCropMode && (
+                    <div className="space-y-2">
+                      <Label className="text-xs">Aspect Ratio</Label>
+                      <div className="flex flex-wrap gap-1">
+                        {aspectRatioPresets.map((preset) => (
+                          <Button
+                            key={preset.label}
+                            variant={aspectRatio === preset.value ? "default" : "outline"}
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => handleAspectRatioChange(preset.value)}
+                          >
+                            {preset.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Resize Slider */}
                   <div className="space-y-2">
@@ -846,9 +923,72 @@ const MediaLibraryTab = () => {
                     )}
                   </div>
 
+                  {/* Filters Section */}
+                  <div className="space-y-3 pt-2 border-t">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-medium">Filters</Label>
+                      {hasFilterChanges && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs"
+                          onClick={resetFilters}
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" />
+                          Reset
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {/* Brightness */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-muted-foreground">Brightness</Label>
+                        <span className="text-xs text-muted-foreground">{brightness}%</span>
+                      </div>
+                      <Slider
+                        value={[brightness]}
+                        onValueChange={([value]) => setBrightness(value)}
+                        min={0}
+                        max={200}
+                        step={5}
+                      />
+                    </div>
+                    
+                    {/* Contrast */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-muted-foreground">Contrast</Label>
+                        <span className="text-xs text-muted-foreground">{contrast}%</span>
+                      </div>
+                      <Slider
+                        value={[contrast]}
+                        onValueChange={([value]) => setContrast(value)}
+                        min={0}
+                        max={200}
+                        step={5}
+                      />
+                    </div>
+                    
+                    {/* Saturation */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-muted-foreground">Saturation</Label>
+                        <span className="text-xs text-muted-foreground">{saturation}%</span>
+                      </div>
+                      <Slider
+                        value={[saturation]}
+                        onValueChange={([value]) => setSaturation(value)}
+                        min={0}
+                        max={200}
+                        step={5}
+                      />
+                    </div>
+                  </div>
+
                   {/* Save/Download buttons */}
-                  {(isCropMode || resizeScale !== 100) && (
-                    <div className="flex gap-2">
+                  {(isCropMode || resizeScale !== 100 || hasFilterChanges) && (
+                    <div className="flex gap-2 pt-2">
                       <Button
                         size="sm"
                         className="flex-1"
