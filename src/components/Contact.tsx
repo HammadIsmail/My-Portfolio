@@ -31,15 +31,23 @@ const Contact = () => {
   });
 
   // EmailJS credentials
-  const serviceId = "service_42m4lca";
-  const templateId = "template_5rfqb7d";
-  const userId = "jKYS-Zm28fRW5zF8Q";
+  const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_42m4lca";
+  const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "template_5rfqb7d";
+  const userId = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "jKYS-Zm28fRW5zF8Q";
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (!formRef.current) return;
-
     emailjs
-      .sendForm(serviceId, templateId, formRef.current, userId)
+      .send(
+        serviceId, 
+        templateId, 
+        {
+          from_name: values.name,
+          to_name: "Hammad",
+          message: values.message,
+          reply_to: values.email,
+        }, 
+        userId
+      )
       .then(
         (result) => {
           console.log('Email sent successfully!', result.text);
