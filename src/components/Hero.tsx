@@ -1,11 +1,23 @@
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { usePortfolio } from "@/context/PortfolioContext";
+import { Icon } from "@iconify/react";
 
 const Hero = () => {
   const { ref, isVisible } = useScrollAnimation();
   const { navigateToSection, isMobile } = usePortfolio();
+  const [previewImage, setPreviewImage] = useState<{
+    src: string;
+    alt: string;
+    rounded?: boolean;
+  } | null>(null);
 
   const goToProjects = () => {
     if (isMobile) {
@@ -19,11 +31,7 @@ const Hero = () => {
   return (
     <section
       id="profile"
-      className={
-        isMobile
-          ? "min-h-screen flex items-center py-20"
-          : "py-6"
-      }
+      className={isMobile ? "py-4 sm:py-6" : "py-6"}
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
         <div
@@ -33,25 +41,44 @@ const Hero = () => {
           }`}
         >
           {/* Cover Image */}
-          <div className="relative h-48 sm:h-64 md:h-80 w-full bg-muted">
+          <button
+            type="button"
+            onClick={() =>
+              setPreviewImage({ src: "/cover.webp", alt: "Cover image" })
+            }
+            className="relative block h-48 sm:h-64 md:h-80 w-full bg-muted cursor-zoom-in group"
+            aria-label="Preview cover image"
+          >
             <img
               src="/cover.webp"
               alt="Cover"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
             />
-          </div>
+            <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+          </button>
 
           {/* Profile Container */}
           <div className="relative px-6 sm:px-8 pb-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 sm:-mt-20 sm:mb-4 mb-4">
               {/* Profile Image */}
-              <div className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background overflow-hidden shrink-0">
+              <button
+                type="button"
+                onClick={() =>
+                  setPreviewImage({
+                    src: "/profile.webp",
+                    alt: "Muhammad Hammad profile photo",
+                    rounded: true,
+                  })
+                }
+                className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background overflow-hidden shrink-0 cursor-zoom-in group"
+                aria-label="Preview profile image"
+              >
                 <img
                   src="/profile.webp"
                   alt="Muhammad Hammad"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-              </div>
+              </button>
 
               {/* Action Buttons */}
               <div className="flex flex-nowrap gap-2 sm:gap-3 mt-4 sm:mt-0 sm:ml-4 w-full sm:w-auto self-start sm:self-end">
@@ -63,7 +90,9 @@ const Hero = () => {
                     href="https://www.linkedin.com/in/muhammad-hammad-uet/"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5"
                   >
+                    <Icon icon="lucide:linkedin" className="w-4 h-4" />
                     LinkedIn
                   </a>
                 </Button>
@@ -72,7 +101,9 @@ const Hero = () => {
                     href="https://github.com/HammadIsmail"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5"
                   >
+                    <Icon icon="lucide:github" className="w-4 h-4" />
                     Github
                   </a>
                 </Button>
@@ -104,6 +135,26 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      <Dialog
+        open={!!previewImage}
+        onOpenChange={(open) => !open && setPreviewImage(null)}
+      >
+        <DialogContent className="max-w-5xl w-[95vw] p-2 sm:p-4 border-none bg-background/95 shadow-2xl">
+          <DialogTitle className="sr-only">
+            {previewImage?.alt ?? "Image preview"}
+          </DialogTitle>
+          {previewImage && (
+            <img
+              src={previewImage.src}
+              alt={previewImage.alt}
+              className={`w-full h-auto max-h-[85vh] object-contain mx-auto ${
+                previewImage.rounded ? "max-w-md rounded-full aspect-square object-cover" : "rounded-lg"
+              }`}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

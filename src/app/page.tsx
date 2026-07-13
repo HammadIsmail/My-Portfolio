@@ -1,7 +1,6 @@
 import Sidebar from "@/components/Sidebar";
 import PortfolioContent from "@/components/PortfolioContent";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { PortfolioProvider } from "@/context/PortfolioContext";
 import connectDB from "@/lib/db";
 import Project from "@/models/Project";
 

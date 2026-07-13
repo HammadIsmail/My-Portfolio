@@ -51,12 +51,7 @@ const PortfolioContent = ({ projects }: { projects: ProjectType[] }) => {
         ))}
       {activeSection === "experience" && <Experience />}
       {activeSection === "skills" && <Skills />}
-      {activeSection === "contact" && (
-        <>
-          <Contact />
-          <Footer />
-        </>
-      )}
+      {activeSection === "contact" && <Contact />}
     </div>
   );
 };

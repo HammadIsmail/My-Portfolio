@@ -5,6 +5,7 @@ import { usePortfolio } from "@/context/PortfolioContext";
 
 const Experience = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { isMobile } = usePortfolio();
 
   const experiences = [
     {
@@ -37,31 +38,42 @@ const Experience = () => {
     <section
       ref={ref}
       id="experience"
-      className="py-12 sm:py-16 lg:py-20 bg-background"
+      className={isMobile ? "py-12 sm:py-16 lg:py-20" : "py-6"}
     >
       <div className="container mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">
-          Experience
-        </h2>
+        {isMobile && (
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">
+            Experience
+          </h2>
+        )}
 
-        <div className="max-w-4xl mx-auto relative">
+        <div className={`max-w-4xl mx-auto relative ${isMobile ? "space-y-6" : ""}`}>
           {experiences.map((exp, index) => (
             <div
               key={index}
-              className="sticky top-20"
-              style={{ 
-                zIndex: index + 1,
-                paddingBottom: index === experiences.length - 1 ? '0' : '1.5rem'
-              }}
+              className={isMobile ? "" : "sticky top-4"}
+              style={
+                isMobile
+                  ? undefined
+                  : {
+                      zIndex: index + 1,
+                      paddingBottom: index === experiences.length - 1 ? "0" : "1.5rem",
+                    }
+              }
             >
               <div
                 className={`bg-card rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-700 border border-border ${
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                 }`}
-                style={{ 
+                style={{
                   transitionDelay: `${index * 150}ms`,
-                  transform: isVisible ? `scale(${1 - index * 0.02})` : 'translateY(40px)',
-                  transformOrigin: 'top center'
+                  transform:
+                    isVisible && !isMobile
+                      ? `scale(${1 - index * 0.02})`
+                      : isVisible
+                        ? undefined
+                        : "translateY(40px)",
+                  transformOrigin: "top center",
                 }}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">

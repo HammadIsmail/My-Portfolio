@@ -1,10 +1,12 @@
 "use client";
 import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const Skills = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const { isMobile } = usePortfolio();
 
   const skills = [
     { name: "React", icon: "logos:react" },
@@ -57,12 +59,14 @@ const Skills = () => {
     <section
       ref={sectionRef}
       id="skills"
-      className="py-12 sm:py-16 lg:py-20 bg-muted/30"
+      className={isMobile ? "py-12 sm:py-16 lg:py-20 bg-muted/30" : "py-6 bg-muted/30"}
     >
       <div className="container mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">
-          Skills
-        </h2>
+        {isMobile && (
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">
+            Skills
+          </h2>
+        )}
 
         {/* Skills Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 mb-12 sm:mb-16">

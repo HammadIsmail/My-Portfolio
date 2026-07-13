@@ -40,25 +40,36 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
   };
 
   return (
-    <section ref={sectionRef} id="projects" className="py-12 sm:py-16 lg:py-20 bg-background">
+    <section ref={sectionRef} id="projects" className={isMobile ? "py-12 sm:py-16 lg:py-20" : "py-6"}>
       <div className="container mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Projects</h2>
-        <div ref={ref} className="relative">
+        {isMobile && (
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Projects</h2>
+        )}
+        <div ref={ref} className={isMobile ? "relative space-y-6" : "relative"}>
           {projects.map((project, index) => (
             <div
               key={project.id}
-              className={isMobile ? "sticky top-20" : "sticky top-4"}
-              style={{
-                zIndex: index + 1,
-                paddingBottom: index === projects.length - 1 ? '0' : '2rem'
-              }}
+              className={isMobile ? "" : "sticky top-4"}
+              style={
+                isMobile
+                  ? undefined
+                  : {
+                      zIndex: index + 1,
+                      paddingBottom: index === projects.length - 1 ? "0" : "2rem",
+                    }
+              }
             >
               <Card
-                className={`overflow-hidden border-none shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-700 bg-card ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                className={`overflow-hidden border-none shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-700 bg-card ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
                 style={{
                   transitionDelay: `${index * 100}ms`,
-                  transform: isVisible ? `scale(${1 - index * 0.02})` : 'translateY(40px)',
-                  transformOrigin: 'top center'
+                  transform:
+                    isVisible && !isMobile
+                      ? `scale(${1 - index * 0.02})`
+                      : isVisible
+                        ? undefined
+                        : "translateY(40px)",
+                  transformOrigin: "top center",
                 }}
               >
                 <div className={`grid lg:grid-cols-2 gap-0 ${project.imagePosition === 'left' ? 'lg:grid-flow-dense' : ''}`}>
@@ -96,9 +107,13 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
                       src={project.image}
                       alt={project.title}
                       className="w-full h-full object-cover transition-transform duration-100 ease-out"
-                      style={{
-                        transform: `translateY(${getParallaxOffset(index)}px) scale(1.1)`
-                      }}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transform: `translateY(${getParallaxOffset(index)}px) scale(1.1)`,
+                            }
+                      }
                     />
                   </div>
                 </div>
