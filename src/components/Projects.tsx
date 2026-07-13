@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 // Define the type so the component knows what to expect
 type ProjectType = {
@@ -29,6 +30,7 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
   }, []);
 
   const router = useRouter();
+  const { openCaseStudy, isMobile } = usePortfolio();
 
   const getParallaxOffset = (index: number) => {
     if (!sectionRef.current) return 0;
@@ -45,7 +47,7 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
           {projects.map((project, index) => (
             <div
               key={project.id}
-              className="sticky top-20"
+              className={isMobile ? "sticky top-20" : "sticky top-4"}
               style={{
                 zIndex: index + 1,
                 paddingBottom: index === projects.length - 1 ? '0' : '2rem'
@@ -79,7 +81,11 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
                       <Button
                         variant="outline"
                         className="w-full sm:w-auto min-h-[44px]"
-                        onClick={() => router.push(`/project/${project.id}`)}
+                        onClick={() =>
+                          isMobile
+                            ? router.push(`/project/${project.id}`)
+                            : openCaseStudy(String(project.id))
+                        }
                       >
                         View Case Study
                       </Button>

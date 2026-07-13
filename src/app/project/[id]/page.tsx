@@ -13,7 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -61,8 +61,9 @@ export default async function ProjectPage({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-grow pt-24 pb-12 sm:pt-32 sm:pb-16 lg:pt-40 lg:pb-20">
+      <Sidebar />
+      <div className="flex-grow flex flex-col md:pl-64">
+        <main className="flex-grow pt-24 pb-12 sm:pt-24 sm:pb-16 md:pt-12 lg:pt-16 lg:pb-20">
         <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
           <Link href="/" className="inline-flex items-center text-sm font-medium hover:text-primary transition-colors mb-8">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -133,8 +134,9 @@ export default async function ProjectPage({
             )}
           </article>
         </div>
-      </main>
-      <Footer />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

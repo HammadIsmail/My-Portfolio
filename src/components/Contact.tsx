@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100, { message: "Name must be less than 100 characters" }),
@@ -36,9 +37,9 @@ const Contact = () => {
   const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || "template_5rfqb7d";
   const userId = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || "jKYS-Zm28fRW5zF8Q";
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    emailjs
-      .send(
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const result = await emailjs.send(
         serviceId, 
         templateId, 
         {
@@ -49,25 +50,21 @@ const Contact = () => {
           reply_to: values.email,
         }, 
         userId
-      )
-      .then(
-        (result) => {
-          console.log('Email sent successfully!', result.text);
-          toast({
-            title: "Message sent!",
-            description: "Thank you for reaching out. I'll get back to you soon.",
-          });
-          form.reset();
-        },
-        (error) => {
-          console.error('Failed to send email:', error.text);
-          toast({
-            title: "Failed to send",
-            description: "Something went wrong. Please try again.",
-            variant: "destructive",
-          });
-        }
       );
+      console.log('Email sent successfully!', result.text);
+      toast({
+        title: "Message sent!",
+        description: "Thank you for reaching out. I'll get back to you soon.",
+      });
+      form.reset();
+    } catch (error: any) {
+      console.error('Failed to send email:', error?.text || error);
+      toast({
+        title: "Failed to send",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -139,7 +136,14 @@ const Contact = () => {
                   className="w-full sm:w-auto sm:px-12 min-h-[48px]"
                   disabled={form.formState.isSubmitting}
                 >
-                  {form.formState.isSubmitting ? "Sending..." : "Send"}
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send"
+                  )}
                 </Button>
               </div>
             </form>

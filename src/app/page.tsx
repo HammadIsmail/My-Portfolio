@@ -1,11 +1,7 @@
-import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import Projects from "@/components/Projects";
-import Experience from "@/components/Experience";
-import Skills from "@/components/Skills";
-import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+import Sidebar from "@/components/Sidebar";
+import PortfolioContent from "@/components/PortfolioContent";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { PortfolioProvider } from "@/context/PortfolioContext";
 import connectDB from "@/lib/db";
 import Project from "@/models/Project";
 
@@ -15,7 +11,6 @@ export default async function Home() {
   await connectDB();
   const projectsData = await Project.find({}).sort({ createdAt: -1 }).lean();
   
-  // Transform _id to string so it can be passed to client component
   const projects = projectsData.map(p => ({
     id: p._id.toString(),
     title: p.title,
@@ -26,15 +21,12 @@ export default async function Home() {
   }));
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <Hero />
-      <Projects projects={projects} />
-      <Experience />
-      <Skills />
-      <Contact />
-      <Footer />
-      <WhatsAppButton />
+    <div className="min-h-screen md:h-screen md:overflow-hidden">
+      <Sidebar />
+      <main className="pt-16 md:pt-0 md:fixed md:top-0 md:right-0 md:bottom-0 md:left-64 md:overflow-hidden">
+        <PortfolioContent projects={projects} />
+        <WhatsAppButton />
+      </main>
     </div>
   );
 }

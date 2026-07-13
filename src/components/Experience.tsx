@@ -1,6 +1,7 @@
 "use client";
 import { MapPin, Calendar } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const Experience = () => {
   const { ref, isVisible } = useScrollAnimation();

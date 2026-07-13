@@ -1,99 +1,105 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-portrait.jpg";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const Hero = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { navigateToSection, isMobile } = usePortfolio();
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: "smooth" });
+  const goToProjects = () => {
+    if (isMobile) {
+      const element = document.getElementById("projects");
+      element?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigateToSection("projects");
+    }
   };
 
   return (
     <section
-      id="about"
-      className="min-h-screen flex items-center pt-20 sm:pt-24"
+      id="profile"
+      className={
+        isMobile
+          ? "min-h-screen flex items-center py-20"
+          : "py-6"
+      }
     >
-      <div className="container mx-auto px-4 sm:px-6">
+      <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
         <div
           ref={ref}
-          className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center"
+          className={`bg-card border rounded-2xl shadow-sm overflow-hidden transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
         >
-          <div
-            className={`space-y-4 sm:space-y-6 text-center lg:text-left transition-all duration-700 ${isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-              }`}
-          >
-            <p className="text-xs sm:text-sm font-semibold tracking-wider text-primary uppercase">
-              FullStack Developer
-            </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
-              Hello, my name is Hammad
-            </h1>
-            <p className="text-base text-center sm:text-lg text-muted-foreground max-w-md mx-auto lg:mx-0">
-              Hi, I'm Hammad, a Full-Stack Developer specializing in the MERN
-              stack. I build scalable web and mobile applications using React,
-              Next.js, React Native, Express.js, and FastAPI, with real-time
-              features via Socket.IO. I optimize databases (MongoDB, PostgreSQL,
-              MySQL), deploy on AWS, and integrate AI using OpenAI APIs.
-              Experienced with international teams, I deliver efficient,
-              cloud-ready, AI-powered solutions that drive real business
-              results.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 justify-center lg:justify-start">
-              <Button
-                onClick={() => scrollToSection("projects")}
-                size="lg"
-                className="w-full sm:w-auto min-h-[48px]"
-              >
-                Projects
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                asChild
-                className="w-full sm:w-auto min-h-[48px]"
-              >
-                <a
-                  href="https://www.linkedin.com/in/muhammad-hammad-uet/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LinkedIn
-                </a>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                asChild
-                className="w-full sm:w-auto min-h-[48px]"
-              >
-                <a
-                  href="https://github.com/HammadIsmail"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Github
-                </a>
-              </Button>
-            </div>
+          {/* Cover Image */}
+          <div className="relative h-48 sm:h-64 md:h-80 w-full bg-muted">
+            <img
+              src="/cover.webp"
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div
-            className={`relative order-first lg:order-last transition-all duration-700 delay-300 ${isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-              }`}
-          >
-            <div className="relative w-full aspect-square max-w-[280px] sm:max-w-[400px] lg:max-w-lg mx-auto">
-              <div className="absolute inset-0 bg-primary rounded-full"></div>
-              <img
-                src={"/hammad.png"}
-                alt="Hammad -FullStack Developer"
-                className="absolute bottom-0 right-0 w-full h-full object-cover object-top rounded-full"
-              />
+
+          {/* Profile Container */}
+          <div className="relative px-6 sm:px-8 pb-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 sm:-mt-20 sm:mb-4 mb-4">
+              {/* Profile Image */}
+              <div className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background overflow-hidden shrink-0">
+                <img
+                  src="/profile.webp"
+                  alt="Muhammad Hammad"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-nowrap gap-2 sm:gap-3 mt-4 sm:mt-0 sm:ml-4 w-full sm:w-auto self-start sm:self-end">
+                <Button onClick={goToProjects} className="flex-1 sm:flex-none min-w-0 px-3 sm:min-w-[100px] text-xs sm:text-sm">
+                  Projects
+                </Button>
+                <Button variant="outline" asChild className="flex-1 sm:flex-none min-w-0 px-3 text-xs sm:text-sm">
+                  <a
+                    href="https://www.linkedin.com/in/muhammad-hammad-uet/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    LinkedIn
+                  </a>
+                </Button>
+                <Button variant="outline" asChild className="flex-1 sm:flex-none min-w-0 px-3 text-xs sm:text-sm">
+                  <a
+                    href="https://github.com/HammadIsmail"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Github
+                  </a>
+                </Button>
+              </div>
+            </div>
+
+            {/* Profile Info */}
+            <div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                Muhammad Hammad
+              </h1>
+              <p className="text-sm sm:text-base font-semibold text-primary mt-1">
+                FullStack & AI Developer
+              </p>
+            </div>
+
+            {/* Bio */}
+            <div className="mt-6 text-base sm:text-lg text-muted-foreground space-y-4 max-w-4xl">
+              <p>
+                I'm a Full-Stack Developer passionate about building scalable, high-performance web and mobile applications. I specialize in React, Next.js, React Native, Node.js (Express), FastAPI, and NestJS, with experience designing backend systems using MongoDB, PostgreSQL, MySQL, and Neo4j.
+              </p>
+              <p>
+                I also build AI-powered applications, integrating large language models and intelligent workflows into production-ready software. My experience includes developing REST and GraphQL APIs, real-time applications with Socket.IO, cloud deployment, and modern software architecture.
+              </p>
+              <p>
+                Through hackathons, collaborative projects, and real-world development, I've built solutions ranging from AI platforms to enterprise applications. I enjoy solving challenging problems, writing clean and maintainable code, and creating software that delivers meaningful value to users and businesses.
+              </p>
             </div>
           </div>
         </div>
