@@ -82,88 +82,122 @@ export async function PUT(
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    const formData = await request.formData();
+    const contentType = request.headers.get('content-type') || '';
 
-    // Text fields
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const content = formData.get('content') as string;
-    const demoUrl = formData.get('demoUrl') as string;
-    const tagsString = formData.get('tags') as string;
-    const imagePosition = formData.get('imagePosition') as string || 'left';
-    const featured = formData.get('featured') === 'true';
-
-    // File fields
-    const imageFile = formData.get('image') as File | null;
-    const videoFile = formData.get('video') as File | null;
-    
-    // Existing image URLs that should be kept in the order specified
-    const existingImagesRaw = formData.getAll('existingImages') as string[];
-    // New slider files
-    const newSliderFiles = formData.getAll('newImages') as File[];
-    // Order of all slider items (mixing existing URLs and new file names/indices to maintain correct order)
-    const sliderOrder = formData.getAll('sliderOrder') as string[]; 
-
+    let title, description, content, demoUrl, tagsString, imagePosition, featured;
     let imageUrl = project.image;
-    if (imageFile && imageFile.size > 0) {
-      // Delete old
-      await deleteFromCloudinary(project.image);
-      // Upload new
-      const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
-      const uploadedImage = await uploadToCloudinary(imageBuffer, 'portfolio/projects', 'image');
-      imageUrl = uploadedImage.secure_url;
-    }
-
     let videoUrl = project.videoUrl || '';
-    if (videoFile && videoFile.size > 0) {
-      if (project.videoUrl) await deleteFromCloudinary(project.videoUrl);
-      const videoBuffer = Buffer.from(await videoFile.arrayBuffer());
-      const upload = await uploadToCloudinary(videoBuffer, 'portfolio/projects/video', 'video');
-      videoUrl = upload.secure_url;
-    }
+    let finalSliderImages: string[] = [];
+    let oldImagesToRemove: string[] = [];
 
-    // Process new slider images
-    const newImageUrls: Record<string, string> = {};
-    for (let i = 0; i < newSliderFiles.length; i++) {
-      const file = newSliderFiles[i];
-      if (file && file.size > 0) {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const upload = await uploadToCloudinary(buffer, 'portfolio/projects/slider', 'image');
-        // Store the url with the original filename as key so we can place it in the correct order
-        newImageUrls[file.name] = upload.secure_url;
+    if (contentType.includes('application/json')) {
+      const body = await request.json();
+      title = body.title;
+      description = body.description;
+      content = body.content;
+      demoUrl = body.demoUrl;
+      tagsString = body.tags;
+      imagePosition = body.imagePosition || 'left';
+      featured = body.featured === true || body.featured === 'true';
+      
+      if (body.image) imageUrl = body.image;
+      if (body.videoUrl !== undefined) videoUrl = body.videoUrl;
+      
+      finalSliderImages = body.images || [];
+
+      // Find images to delete
+      if (project.images && Array.isArray(project.images)) {
+        oldImagesToRemove = project.images.filter((oldImg: string) => !finalSliderImages.includes(oldImg));
       }
-    }
+      if (project.image && project.image !== imageUrl) {
+        oldImagesToRemove.push(project.image);
+      }
+      if (project.videoUrl && project.videoUrl !== videoUrl) {
+        oldImagesToRemove.push(project.videoUrl);
+      }
+    } else {
+      const formData = await request.formData();
 
-    // Determine final slider images array in the correct order
-    const finalSliderImages: string[] = [];
-    if (sliderOrder && sliderOrder.length > 0) {
-      for (const item of sliderOrder) {
-        if (item.startsWith('existing:')) {
-          finalSliderImages.push(item.replace('existing:', ''));
-        } else if (item.startsWith('new:')) {
-          const fileName = item.replace('new:', '');
-          if (newImageUrls[fileName]) {
-            finalSliderImages.push(newImageUrls[fileName]);
+      // Text fields
+      title = formData.get('title') as string;
+      description = formData.get('description') as string;
+      content = formData.get('content') as string;
+      demoUrl = formData.get('demoUrl') as string;
+      tagsString = formData.get('tags') as string;
+      imagePosition = formData.get('imagePosition') as string || 'left';
+      featured = formData.get('featured') === 'true';
+
+      // File fields
+      const imageFile = formData.get('image') as File | null;
+      const videoFile = formData.get('video') as File | null;
+      
+      // Existing image URLs that should be kept in the order specified
+      const existingImagesRaw = formData.getAll('existingImages') as string[];
+      // New slider files
+      const newSliderFiles = formData.getAll('newImages') as File[];
+      // Order of all slider items
+      const sliderOrder = formData.getAll('sliderOrder') as string[]; 
+
+      if (imageFile && imageFile.size > 0) {
+        oldImagesToRemove.push(project.image);
+        const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+        const uploadedImage = await uploadToCloudinary(imageBuffer, 'portfolio/projects', 'image');
+        imageUrl = uploadedImage.secure_url;
+      }
+
+      if (videoFile && videoFile.size > 0) {
+        if (project.videoUrl) oldImagesToRemove.push(project.videoUrl);
+        const videoBuffer = Buffer.from(await videoFile.arrayBuffer());
+        const upload = await uploadToCloudinary(videoBuffer, 'portfolio/projects/video', 'video');
+        videoUrl = upload.secure_url;
+      }
+
+      // Process new slider images
+      const newImageUrls: Record<string, string> = {};
+      for (let i = 0; i < newSliderFiles.length; i++) {
+        const file = newSliderFiles[i];
+        if (file && file.size > 0) {
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const upload = await uploadToCloudinary(buffer, 'portfolio/projects/slider', 'image');
+          newImageUrls[file.name] = upload.secure_url;
+        }
+      }
+
+      // Determine final slider images array in the correct order
+      if (sliderOrder && sliderOrder.length > 0) {
+        for (const item of sliderOrder) {
+          if (item.startsWith('existing:')) {
+            finalSliderImages.push(item.replace('existing:', ''));
+          } else if (item.startsWith('new:')) {
+            const fileName = item.replace('new:', '');
+            if (newImageUrls[fileName]) {
+              finalSliderImages.push(newImageUrls[fileName]);
+            }
+          }
+        }
+      } else {
+        // Fallback if no order is provided
+        finalSliderImages.push(...existingImagesRaw);
+        finalSliderImages.push(...Object.values(newImageUrls));
+      }
+      
+      // Cleanup any existing images that were removed
+      if (project.images && Array.isArray(project.images)) {
+        for (const oldImg of project.images) {
+          if (!finalSliderImages.includes(oldImg)) {
+            oldImagesToRemove.push(oldImg);
           }
         }
       }
-    } else {
-      // Fallback if no order is provided
-      finalSliderImages.push(...existingImagesRaw);
-      finalSliderImages.push(...Object.values(newImageUrls));
     }
-    
-    // Cleanup any existing images that were removed
-    if (project.images && Array.isArray(project.images)) {
-      for (const oldImg of project.images) {
-        if (!finalSliderImages.includes(oldImg)) {
-          await deleteFromCloudinary(oldImg);
-        }
-      }
+
+    // Cleanup images in Cloudinary
+    for (const imgToRemove of oldImagesToRemove) {
+      await deleteFromCloudinary(imgToRemove);
     }
 
     // Ensure we have at least one image if the slider is somehow empty but we have a main image
-    if (finalSliderImages.length === 0) {
+    if (finalSliderImages.length === 0 && imageUrl) {
       finalSliderImages.push(imageUrl);
     }
 
@@ -171,7 +205,7 @@ export async function PUT(
     project.description = description;
     project.content = content;
     project.demoUrl = demoUrl;
-    project.tags = tagsString ? tagsString.split(',').map(tag => tag.trim()) : [];
+    project.tags = tagsString ? tagsString.split(',').map((tag: string) => tag.trim()) : [];
     project.imagePosition = imagePosition;
     project.featured = featured;
     project.image = imageUrl;

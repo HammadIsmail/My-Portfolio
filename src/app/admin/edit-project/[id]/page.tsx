@@ -93,50 +93,75 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
     setSliderImages((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const uploadToCloudinary = async (file: File, folder: string, resourceType: 'image' | 'video') => {
+    const signRes = await axios.post('/api/cloudinary-sign', { folder });
+    const { timestamp, signature, cloudName, apiKey } = signRes.data;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', apiKey);
+    formData.append('timestamp', timestamp);
+    formData.append('signature', signature);
+    formData.append('folder', folder);
+
+    const uploadRes = await axios.post(
+      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      formData
+    );
+    return uploadRes.data.secure_url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("demoUrl", demoUrl);
-    formData.append("tags", tags);
-    formData.append("imagePosition", imagePosition);
-    formData.append("featured", featured.toString());
-    formData.append("content", content);
-    
-    if (thumbnail) {
-      formData.append("image", thumbnail);
-    }
-
-    // Pass the images in their current sorted order
-    sliderImages.forEach(img => {
-      if (img.file) {
-        formData.append("newImages", img.file);
-      } else if (img.isExisting) {
-        formData.append("existingImages", img.url);
-      }
-      formData.append("sliderOrder", img.id);
-    });
-
-    if (video) {
-      formData.append("video", video);
-    }
+    setUploadProgress(10);
 
     try {
-      const res = await axios.put(`/api/projects/${projectId}`, formData, {
+      let finalImageUrl = thumbnailUrl;
+      if (thumbnail) {
+        finalImageUrl = await uploadToCloudinary(thumbnail, 'portfolio/projects', 'image');
+        setUploadProgress(30);
+      }
+
+      const finalImages: string[] = [];
+      let i = 0;
+      for (const img of sliderImages) {
+        if (img.file) {
+          const url = await uploadToCloudinary(img.file, 'portfolio/projects/slider', 'image');
+          finalImages.push(url);
+        } else if (img.isExisting) {
+          finalImages.push(img.url);
+        }
+        i++;
+        setUploadProgress(30 + Math.floor((i / Math.max(sliderImages.length, 1)) * 40));
+      }
+
+      let finalVideoUrl = videoUrl;
+      if (video) {
+        finalVideoUrl = await uploadToCloudinary(video, 'portfolio/projects/video', 'video');
+      }
+      setUploadProgress(90);
+
+      const payload = {
+        title,
+        description,
+        demoUrl,
+        tags,
+        imagePosition,
+        featured,
+        content,
+        image: finalImageUrl,
+        images: finalImages,
+        videoUrl: finalVideoUrl || undefined,
+      };
+
+      const res = await axios.put(`/api/projects/${projectId}`, payload, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percentCompleted);
-          }
+          'Content-Type': 'application/json'
         }
       });
 
+      setUploadProgress(100);
       toast({ title: "Project updated successfully!" });
       router.push("/admin");
       router.refresh();

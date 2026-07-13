@@ -49,6 +49,26 @@ export default function AddProjectPage() {
     setSliderImages((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const uploadToCloudinary = async (file: File, folder: string, resourceType: 'image' | 'video') => {
+    // Get signature
+    const signRes = await axios.post('/api/cloudinary-sign', { folder });
+    const { timestamp, signature, cloudName, apiKey } = signRes.data;
+
+    // Upload
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', apiKey);
+    formData.append('timestamp', timestamp);
+    formData.append('signature', signature);
+    formData.append('folder', folder);
+
+    const uploadRes = await axios.post(
+      `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      formData
+    );
+    return uploadRes.data.secure_url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!thumbnail) {
@@ -57,41 +77,53 @@ export default function AddProjectPage() {
     }
 
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("demoUrl", demoUrl);
-    formData.append("tags", tags);
-    formData.append("imagePosition", imagePosition);
-    formData.append("featured", featured.toString());
-    formData.append("content", content);
-    formData.append("image", thumbnail);
-
-    // In POST, we just append them in order since it's a new project
-    sliderImages.forEach(img => {
-      if (img.file) {
-        formData.append("images", img.file);
-      }
-    });
-
-    if (video) {
-      formData.append("video", video);
-    }
+    setUploadProgress(10); // Start progress
 
     try {
-      const res = await axios.post("/api/projects", formData, {
+      // 1. Upload Thumbnail
+      const imageUrl = await uploadToCloudinary(thumbnail, 'portfolio/projects', 'image');
+      setUploadProgress(30);
+
+      // 2. Upload Slider Images
+      const imageUrls: string[] = [];
+      let i = 0;
+      for (const img of sliderImages) {
+        if (img.file) {
+          const url = await uploadToCloudinary(img.file, 'portfolio/projects/slider', 'image');
+          imageUrls.push(url);
+        }
+        i++;
+        setUploadProgress(30 + Math.floor((i / Math.max(sliderImages.length, 1)) * 40));
+      }
+
+      // 3. Upload Video
+      let videoUrl = '';
+      if (video) {
+        videoUrl = await uploadToCloudinary(video, 'portfolio/projects/video', 'video');
+      }
+      setUploadProgress(90);
+
+      // 4. Save Project to DB
+      const payload = {
+        title,
+        description,
+        demoUrl,
+        tags,
+        imagePosition,
+        featured,
+        content,
+        image: imageUrl,
+        images: imageUrls,
+        videoUrl,
+      };
+
+      const res = await axios.post("/api/projects", payload, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(percentCompleted);
-          }
+          'Content-Type': 'application/json'
         }
       });
 
+      setUploadProgress(100);
       toast({ title: "Project created successfully!" });
       router.push("/admin");
       router.refresh();
