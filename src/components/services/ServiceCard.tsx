@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import type { Service } from "@/types/service";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ type ServiceCardProps = {
 const ServiceCard = ({ service, index }: ServiceCardProps) => {
   const prefersReducedMotion = useReducedMotion();
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 24 },
     visible: {
       opacity: 1,
@@ -21,7 +21,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       transition: {
         duration: prefersReducedMotion ? 0 : 0.5,
         delay: prefersReducedMotion ? 0 : index * 0.08,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
@@ -29,13 +29,13 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
   const imageFloat = prefersReducedMotion
     ? {}
     : {
-        y: [0, -4, 0],
-        transition: {
-          duration: 4 + index * 0.3,
-          repeat: Infinity,
-          ease: "easeInOut",
-        },
-      };
+      y: [0, -4, 0],
+      transition: {
+        duration: 4 + index * 0.3,
+        repeat: Infinity,
+        ease: "easeInOut" as const,
+      },
+    };
 
   return (
     <motion.div

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import ServiceCard from "@/components/services/ServiceCard";
 import { services } from "@/data/services";
 import { usePortfolio } from "@/context/PortfolioContext";
@@ -9,14 +9,14 @@ const Services = () => {
   const { isMobile } = usePortfolio();
   const prefersReducedMotion = useReducedMotion();
 
-  const sectionVariants = {
+  const sectionVariants: Variants = {
     hidden: { opacity: 0, y: 32 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: prefersReducedMotion ? 0 : 0.6,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
