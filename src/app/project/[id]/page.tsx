@@ -97,7 +97,7 @@ export default async function ProjectPage({
                       <img
                         src={img}
                         alt={`${project.title} screenshot ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   </CarouselItem>
