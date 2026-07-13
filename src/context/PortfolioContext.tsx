@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export type SectionId = "profile" | "projects" | "experience" | "skills" | "contact";
+export type SectionId = "profile" | "projects" | "experience" | "skills" | "services" | "contact";
 
 type PortfolioContextValue = {
   activeSection: SectionId;

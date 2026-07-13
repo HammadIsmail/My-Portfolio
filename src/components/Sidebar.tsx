@@ -13,6 +13,7 @@ const navLinks: { id: SectionId; label: string }[] = [
   { id: "projects", label: "Projects" },
   { id: "experience", label: "Experience" },
   { id: "skills", label: "Skills" },
+  { id: "services", label: "Services" },
   { id: "contact", label: "Contact" },
 ];
 

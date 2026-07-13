@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Skills from "@/components/Skills";
+import Services from "@/components/services/Services";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ProjectCaseStudy from "@/components/ProjectCaseStudy";
@@ -34,6 +35,7 @@ const PortfolioContent = ({ projects }: { projects: ProjectType[] }) => {
         <Projects projects={projects} />
         <Experience />
         <Skills />
+        <Services />
         <Contact />
         <Footer />
       </>
@@ -51,6 +53,7 @@ const PortfolioContent = ({ projects }: { projects: ProjectType[] }) => {
         ))}
       {activeSection === "experience" && <Experience />}
       {activeSection === "skills" && <Skills />}
+      {activeSection === "services" && <Services />}
       {activeSection === "contact" && <Contact />}
     </div>
   );
