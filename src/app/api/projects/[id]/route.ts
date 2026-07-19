@@ -4,6 +4,8 @@ import Project from '@/models/Project';
 import { uploadToCloudinary, deleteFromCloudinary } from '@/lib/cloudinary';
 import { verifyToken } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 // Define the route for GET (fetch single project), PUT (update), and DELETE
 export async function GET(
   request: Request,
@@ -84,7 +86,7 @@ export async function PUT(
 
     const contentType = request.headers.get('content-type') || '';
 
-    let title, description, content, demoUrl, tagsString, imagePosition, featured;
+    let title, description, content, demoUrl, githubUrl, tagsString, imagePosition, featured;
     let imageUrl = project.image;
     let videoUrl = project.videoUrl || '';
     let finalSliderImages: string[] = [];
@@ -96,6 +98,7 @@ export async function PUT(
       description = body.description;
       content = body.content;
       demoUrl = body.demoUrl;
+      githubUrl = body.githubUrl;
       tagsString = body.tags;
       imagePosition = body.imagePosition || 'left';
       featured = body.featured === true || body.featured === 'true';
@@ -123,6 +126,7 @@ export async function PUT(
       description = formData.get('description') as string;
       content = formData.get('content') as string;
       demoUrl = formData.get('demoUrl') as string;
+      githubUrl = formData.get('githubUrl') as string;
       tagsString = formData.get('tags') as string;
       imagePosition = formData.get('imagePosition') as string || 'left';
       featured = formData.get('featured') === 'true';
@@ -205,6 +209,7 @@ export async function PUT(
     project.description = description;
     project.content = content;
     project.demoUrl = demoUrl;
+    project.githubUrl = githubUrl;
     project.tags = tagsString ? tagsString.split(',').map((tag: string) => tag.trim()) : [];
     project.imagePosition = imagePosition;
     project.featured = featured;

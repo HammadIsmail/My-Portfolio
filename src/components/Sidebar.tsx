@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 const navLinks: { id: SectionId; label: string }[] = [
   { id: "profile", label: "Profile" },
   { id: "projects", label: "Projects" },
+  { id: "hackathons", label: "Hackathons" },
+  { id: "blogs", label: "Blogs" },
   { id: "experience", label: "Experience" },
   { id: "skills", label: "Skills" },
   { id: "services", label: "Services" },

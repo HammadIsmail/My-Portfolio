@@ -23,6 +23,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
   const [tags, setTags] = useState("");
   const [imagePosition, setImagePosition] = useState("left");
   const [featured, setFeatured] = useState(false);
@@ -53,6 +54,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
         setTitle(p.title);
         setDescription(p.description);
         setDemoUrl(p.demoUrl || "");
+        setGithubUrl(p.githubUrl || "");
         setTags(p.tags ? p.tags.join(", ") : "");
         setImagePosition(p.imagePosition || "left");
         setFeatured(p.featured || false);
@@ -146,6 +148,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
         title,
         description,
         demoUrl,
+        githubUrl,
         tags,
         imagePosition,
         featured,
@@ -205,6 +208,11 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
             <div className="space-y-2">
               <Label htmlFor="demoUrl">Live Demo URL</Label>
               <Input id="demoUrl" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} placeholder="https://..." />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="githubUrl">GitHub Repository URL</Label>
+              <Input id="githubUrl" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} placeholder="https://github.com/..." />
             </div>
 
             <div className="space-y-2">

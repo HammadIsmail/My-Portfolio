@@ -22,6 +22,14 @@ export default function AdminLayout({
             <PlusCircle className="w-5 h-5" />
             <span>Add Project</span>
           </Link>
+          <Link href="/admin/add-hackathon" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors">
+            <PlusCircle className="w-5 h-5" />
+            <span>Add Hackathon</span>
+          </Link>
+          <Link href="/admin/add-blog" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors">
+            <PlusCircle className="w-5 h-5" />
+            <span>Add Blog</span>
+          </Link>
         </nav>
         <div className="p-4 border-t border-border">
           <Link href="/" className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-muted transition-colors text-red-500 hover:text-red-600 hover:bg-red-500/10">

@@ -14,6 +14,7 @@ type ProjectType = {
   image: string;
   tags: string[];
   imagePosition: string;
+  githubUrl?: string;
 };
 
 const Projects = ({ projects }: { projects: ProjectType[] }) => {
@@ -88,7 +89,7 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
                         </span>
                       ))}
                     </div>
-                    <div>
+                    <div className="flex flex-wrap gap-3">
                       <Button
                         variant="outline"
                         className="w-full sm:w-auto min-h-[44px]"
@@ -100,6 +101,17 @@ const Projects = ({ projects }: { projects: ProjectType[] }) => {
                       >
                         View Case Study
                       </Button>
+                      {project.githubUrl && (
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto min-h-[44px] hover:bg-primary/10 hover:text-primary transition-colors"
+                          asChild
+                        >
+                          <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                            Github Repo
+                          </a>
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <div className={`relative aspect-[4/3] lg:aspect-auto overflow-hidden ${project.imagePosition === 'left' ? 'lg:col-start-1 lg:row-start-1' : ''}`}>

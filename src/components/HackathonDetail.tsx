@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { usePortfolio } from "@/context/PortfolioContext";
 
-type ProjectDetail = {
+type HackathonDetailProps = {
   title: string;
   description: string;
   content: string;
@@ -25,9 +25,9 @@ type ProjectDetail = {
   videoUrl?: string;
 };
 
-const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
-  const { closeCaseStudy } = usePortfolio();
-  const [project, setProject] = useState<ProjectDetail | null>(null);
+const HackathonDetail = ({ hackathonId }: { hackathonId: string }) => {
+  const { closeHackathon } = usePortfolio();
+  const [hackathon, setHackathon] = useState<HackathonDetailProps | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -35,20 +35,20 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
     setLoading(true);
     setError(false);
 
-    fetch(`/api/projects/${projectId}`)
+    fetch(`/api/hackathons/${hackathonId}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) throw new Error("Failed to fetch hackathon");
         return res.json();
       })
       .then((data) => {
-        setProject(data.project);
+        setHackathon(data.hackathon);
         setLoading(false);
       })
       .catch(() => {
         setError(true);
         setLoading(false);
       });
-  }, [projectId]);
+  }, [hackathonId]);
 
   if (loading) {
     return (
@@ -58,38 +58,40 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
     );
   }
 
-  if (error || !project) {
+  if (error || !hackathon) {
     return (
       <div className="container mx-auto px-4 sm:px-6 py-8 max-w-5xl">
         <button
-          onClick={closeCaseStudy}
+          onClick={closeHackathon}
           className="inline-flex items-center text-sm font-medium hover:text-primary transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Projects
+          Back to Hackathons
         </button>
-        <p className="text-muted-foreground">Project not found.</p>
+        <p className="text-muted-foreground">Hackathon not found.</p>
       </div>
     );
   }
 
-  const isHtml = /<[a-z][\s\S]*>/i.test(project.content);
+  const isHtml = /<[a-z][\s\S]*>/i.test(hackathon.content);
 
   return (
     <div className="py-6 sm:py-8">
       <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
         <button
-          onClick={closeCaseStudy}
+          onClick={closeHackathon}
           className="inline-flex items-center text-sm font-medium hover:text-primary transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Projects
+          Back to Hackathons
         </button>
 
         <div className="mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">{project.title}</h1>
+          <span className="text-xs font-semibold uppercase tracking-wider text-primary mb-2 block">Hackathon Experience</span>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">{hackathon.title}</h1>
+          <p className="text-muted-foreground text-lg mb-6 leading-relaxed">{hackathon.description}</p>
           <div className="flex flex-wrap gap-2 mb-6">
-            {project.tags.map((tag) => (
+            {hackathon.tags.map((tag) => (
               <span
                 key={tag}
                 className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-medium"
@@ -98,17 +100,18 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
               </span>
             ))}
           </div>
+
           <div className="flex flex-wrap gap-4">
-            {project.demoUrl && (
+            {hackathon.demoUrl && (
               <Button asChild>
-                <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">
+                <a href={hackathon.demoUrl} target="_blank" rel="noopener noreferrer">
                   View Live Demo
                 </a>
               </Button>
             )}
-            {project.githubUrl && (
+            {hackathon.githubUrl && (
               <Button variant="outline" className="hover:bg-primary/10 hover:text-primary transition-colors" asChild>
-                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                <a href={hackathon.githubUrl} target="_blank" rel="noopener noreferrer">
                   Github Repo
                 </a>
               </Button>
@@ -119,19 +122,19 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
         <div className="mb-16">
           <Carousel className="w-full max-w-4xl mx-auto">
             <CarouselContent>
-              {project.images.map((img, index) => (
+              {hackathon.images.map((img, index) => (
                 <CarouselItem key={index}>
                   <div className="aspect-[16/9] relative rounded-xl overflow-hidden shadow-lg border border-border bg-muted flex items-center justify-center">
                     <img
                       src={img}
-                      alt={`${project.title} screenshot ${index + 1}`}
+                      alt={`${hackathon.title} screenshot ${index + 1}`}
                       className="w-full h-full object-contain"
                     />
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {project.images.length > 1 && (
+            {hackathon.images.length > 1 && (
               <>
                 <CarouselPrevious className="left-2 sm:-left-12" />
                 <CarouselNext className="right-2 sm:-right-12" />
@@ -139,10 +142,10 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
             )}
           </Carousel>
 
-          {project.videoUrl && (
+          {hackathon.videoUrl && (
             <div className="mt-8 aspect-[16/9] rounded-xl overflow-hidden shadow-lg border border-border bg-muted">
               <iframe
-                src={project.videoUrl}
+                src={hackathon.videoUrl}
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -153,9 +156,9 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
 
         <article className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none text-foreground/90">
           {isHtml ? (
-            <div dangerouslySetInnerHTML={{ __html: project.content }} />
+            <div dangerouslySetInnerHTML={{ __html: hackathon.content }} />
           ) : (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{hackathon.content}</ReactMarkdown>
           )}
         </article>
       </div>
@@ -163,4 +166,4 @@ const ProjectCaseStudy = ({ projectId }: { projectId: string }) => {
   );
 };
 
-export default ProjectCaseStudy;
+export default HackathonDetail;

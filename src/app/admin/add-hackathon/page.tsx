@@ -15,7 +15,7 @@ import { DraggableImageList, ImageItemData } from "@/components/admin/DraggableI
 import { Progress } from "@/components/ui/progress";
 import axios from "axios";
 
-export default function AddProjectPage() {
+export default function AddHackathonPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
@@ -51,11 +51,9 @@ export default function AddProjectPage() {
   };
 
   const uploadToCloudinary = async (file: File, folder: string, resourceType: 'image' | 'video') => {
-    // Get signature
     const signRes = await axios.post('/api/cloudinary-sign', { folder });
     const { timestamp, signature, cloudName, apiKey } = signRes.data;
 
-    // Upload
     const formData = new FormData();
     formData.append('file', file);
     formData.append('api_key', apiKey);
@@ -73,16 +71,16 @@ export default function AddProjectPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!thumbnail) {
-      toast({ title: "Thumbnail is required", variant: "destructive" });
+      toast({ title: "Hackathon logo/image is required", variant: "destructive" });
       return;
     }
 
     setLoading(true);
-    setUploadProgress(10); // Start progress
+    setUploadProgress(10);
 
     try {
       // 1. Upload Thumbnail
-      const imageUrl = await uploadToCloudinary(thumbnail, 'portfolio/projects', 'image');
+      const imageUrl = await uploadToCloudinary(thumbnail, 'portfolio/hackathons', 'image');
       setUploadProgress(30);
 
       // 2. Upload Slider Images
@@ -90,7 +88,7 @@ export default function AddProjectPage() {
       let i = 0;
       for (const img of sliderImages) {
         if (img.file) {
-          const url = await uploadToCloudinary(img.file, 'portfolio/projects/slider', 'image');
+          const url = await uploadToCloudinary(img.file, 'portfolio/hackathons/slider', 'image');
           imageUrls.push(url);
         }
         i++;
@@ -100,11 +98,11 @@ export default function AddProjectPage() {
       // 3. Upload Video
       let videoUrl = '';
       if (video) {
-        videoUrl = await uploadToCloudinary(video, 'portfolio/projects/video', 'video');
+        videoUrl = await uploadToCloudinary(video, 'portfolio/hackathons/video', 'video');
       }
       setUploadProgress(90);
 
-      // 4. Save Project to DB
+      // 4. Save Hackathon to DB
       const payload = {
         title,
         description,
@@ -119,19 +117,19 @@ export default function AddProjectPage() {
         videoUrl,
       };
 
-      const res = await axios.post("/api/projects", payload, {
+      const res = await axios.post("/api/hackathons", payload, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
 
       setUploadProgress(100);
-      toast({ title: "Project created successfully!" });
+      toast({ title: "Hackathon post created successfully!" });
       router.push("/admin");
       router.refresh();
     } catch (error: any) {
       console.error(error);
-      toast({ title: "Error creating project", description: error.response?.data?.error || error.message, variant: "destructive" });
+      toast({ title: "Error creating hackathon", description: error.response?.data?.error || error.message, variant: "destructive" });
     } finally {
       setLoading(false);
       setUploadProgress(0);
@@ -146,7 +144,7 @@ export default function AddProjectPage() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold">Add New Project</h1>
+        <h1 className="text-3xl font-bold font-serif">Add New Hackathon</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -154,13 +152,13 @@ export default function AddProjectPage() {
           {/* Left Column */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="title">Project Title *</Label>
-              <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              <Label htmlFor="title">Hackathon Title *</Label>
+              <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Google AI Hackathon" />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Short Description *</Label>
-              <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+              <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} required placeholder="Sleek tagline about your project/participation" />
             </div>
 
             <div className="space-y-2">
@@ -175,7 +173,7 @@ export default function AddProjectPage() {
 
             <div className="space-y-2">
               <Label htmlFor="tags">Tags (comma separated)</Label>
-              <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="React, Next.js, Tailwind" />
+              <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Next.js, Tailwind, Gemini API" />
             </div>
 
             <div className="space-y-2">
@@ -193,38 +191,38 @@ export default function AddProjectPage() {
 
             <div className="flex items-center space-x-2">
               <Checkbox id="featured" checked={featured} onCheckedChange={(c) => setFeatured(c as boolean)} />
-              <Label htmlFor="featured" className="cursor-pointer">Featured Project</Label>
+              <Label htmlFor="featured" className="cursor-pointer">Featured Post</Label>
             </div>
           </div>
 
           {/* Right Column (Media) */}
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label>Thumbnail Image *</Label>
+              <Label>Hackathon Logo / Cover Image *</Label>
               <div className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-muted/50 transition-colors bg-card">
                 <input type="file" accept="image/*" onChange={(e) => e.target.files && setThumbnail(e.target.files[0])} className="hidden" id="thumbnail-upload" required />
                 <Label htmlFor="thumbnail-upload" className="cursor-pointer flex flex-col items-center">
                   <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
-                  <span className="text-sm font-medium">{thumbnail ? thumbnail.name : "Click to upload thumbnail"}</span>
+                  <span className="text-sm font-medium">{thumbnail ? thumbnail.name : "Click to upload image"}</span>
                   <span className="text-xs text-muted-foreground mt-1">Any format, automatically converted to WebP</span>
                 </Label>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Slider Images (Multiple)</Label>
+              <Label>Gallery / Screenshot Slider (Multiple)</Label>
               <div className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition-colors bg-card">
                 <input type="file" accept="image/*" multiple onChange={handleSliderUpload} className="hidden" id="slider-upload" />
                 <Label htmlFor="slider-upload" className="cursor-pointer flex flex-col items-center w-full h-full">
                   <UploadCloud className="w-8 h-8 text-muted-foreground mb-2" />
-                  <span className="text-sm font-medium">Click to upload slider images</span>
+                  <span className="text-sm font-medium">Click to upload gallery images</span>
                 </Label>
               </div>
               <DraggableImageList items={sliderImages} setItems={setSliderImages} onRemove={handleRemoveSliderImage} />
             </div>
 
             <div className="space-y-2">
-              <Label>Video File (Optional)</Label>
+              <Label>Video Pitch / Demo File (Optional)</Label>
               <div className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-muted/50 transition-colors bg-card">
                 <input type="file" accept="video/*" onChange={(e) => e.target.files && setVideo(e.target.files[0])} className="hidden" id="video-upload" />
                 <Label htmlFor="video-upload" className="cursor-pointer flex flex-col items-center">
@@ -236,9 +234,9 @@ export default function AddProjectPage() {
           </div>
         </div>
 
-        {/* Full Width Editor */}
+        {/* Experience Editor */}
         <div className="space-y-2">
-          <Label>Case Study Content (Markdown / Rich Text) *</Label>
+          <Label>My Experience & Learnings (Markdown / Rich Text) *</Label>
           <RichTextEditor content={content} onChange={setContent} />
         </div>
 
@@ -249,10 +247,10 @@ export default function AddProjectPage() {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 {uploadProgress > 0 && uploadProgress < 100 
                   ? `Uploading ${uploadProgress}%...` 
-                  : "Saving Project..."}
+                  : "Saving Post..."}
               </>
             ) : (
-              "Save Project"
+              "Save Hackathon"
             )}
           </Button>
 

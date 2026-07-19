@@ -122,7 +122,7 @@ const RichTextEditor = ({ content, onChange }: RichTextEditorProps) => {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] p-6',
+        class: 'prose prose-sm dark:prose-invert max-w-none focus:outline-none min-h-[400px] p-6 text-foreground',
       },
       // Force all pastes to be treated as plain text so tiptap-markdown
       // can parse the markdown syntax (## headings, - lists, **bold**, etc.)

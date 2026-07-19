@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const ProjectSchema = new mongoose.Schema(
+const HackathonSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     description: { type: String, required: true },
@@ -17,4 +17,4 @@ const ProjectSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Project || mongoose.model('Project', ProjectSchema);
+export default mongoose.models.Hackathon || mongoose.model('Hackathon', HackathonSchema);

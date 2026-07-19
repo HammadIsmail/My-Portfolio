@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     const contentType = request.headers.get('content-type') || '';
     
-    let title, description, content, demoUrl, tagsString, imagePosition, featured;
+    let title, description, content, demoUrl, githubUrl, tagsString, imagePosition, featured;
     let imageUrl = '';
     let imageUrls: string[] = [];
     let videoUrl = '';
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
       description = body.description;
       content = body.content;
       demoUrl = body.demoUrl;
+      githubUrl = body.githubUrl;
       tagsString = body.tags;
       imagePosition = body.imagePosition || 'left';
       featured = body.featured === true || body.featured === 'true';
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
       description = formData.get('description') as string;
       content = formData.get('content') as string;
       demoUrl = formData.get('demoUrl') as string;
+      githubUrl = formData.get('githubUrl') as string;
       tagsString = formData.get('tags') as string;
       imagePosition = formData.get('imagePosition') as string || 'left';
       featured = formData.get('featured') === 'true';
@@ -86,6 +88,7 @@ export async function POST(request: Request) {
       description,
       content,
       demoUrl,
+      githubUrl,
       tags: tagsString ? tagsString.split(',').map((tag: string) => tag.trim()) : [],
       imagePosition,
       featured,

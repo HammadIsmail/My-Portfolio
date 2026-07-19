@@ -82,11 +82,18 @@ export default async function ProjectPage({
                 </span>
               ))}
             </div>
-            {project.demoUrl && (
-              <Button asChild>
-                <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">View Live Demo</a>
-              </Button>
-            )}
+            <div className="flex flex-wrap gap-4">
+              {project.demoUrl && (
+                <Button asChild>
+                  <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">View Live Demo</a>
+                </Button>
+              )}
+              {project.githubUrl && (
+                <Button variant="outline" className="hover:bg-primary/10 hover:text-primary transition-colors" asChild>
+                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">Github Repo</a>
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="mb-16">

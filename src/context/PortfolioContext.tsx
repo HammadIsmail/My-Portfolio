@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export type SectionId = "profile" | "projects" | "experience" | "skills" | "services" | "contact";
+export type SectionId = "profile" | "projects" | "experience" | "skills" | "services" | "contact" | "hackathons" | "blogs";
 
 type PortfolioContextValue = {
   activeSection: SectionId;
@@ -11,6 +11,12 @@ type PortfolioContextValue = {
   selectedProjectId: string | null;
   openCaseStudy: (projectId: string) => void;
   closeCaseStudy: () => void;
+  selectedHackathonId: string | null;
+  openHackathon: (hackathonId: string) => void;
+  closeHackathon: () => void;
+  selectedBlogId: string | null;
+  openBlog: (blogId: string) => void;
+  closeBlog: () => void;
   isMobile: boolean;
 };
 
@@ -20,10 +26,14 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<SectionId>("profile");
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedHackathonId, setSelectedHackathonId] = useState<string | null>(null);
+  const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
 
   const navigateToSection = useCallback((section: SectionId) => {
     setActiveSection(section);
     setSelectedProjectId(null);
+    setSelectedHackathonId(null);
+    setSelectedBlogId(null);
   }, []);
 
   const openCaseStudy = useCallback((projectId: string) => {
@@ -35,6 +45,24 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     setSelectedProjectId(null);
   }, []);
 
+  const openHackathon = useCallback((hackathonId: string) => {
+    setActiveSection("hackathons");
+    setSelectedHackathonId(hackathonId);
+  }, []);
+
+  const closeHackathon = useCallback(() => {
+    setSelectedHackathonId(null);
+  }, []);
+
+  const openBlog = useCallback((blogId: string) => {
+    setActiveSection("blogs");
+    setSelectedBlogId(blogId);
+  }, []);
+
+  const closeBlog = useCallback(() => {
+    setSelectedBlogId(null);
+  }, []);
+
   return (
     <PortfolioContext.Provider
       value={{
@@ -43,6 +71,12 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         selectedProjectId,
         openCaseStudy,
         closeCaseStudy,
+        selectedHackathonId,
+        openHackathon,
+        closeHackathon,
+        selectedBlogId,
+        openBlog,
+        closeBlog,
         isMobile,
       }}
     >
