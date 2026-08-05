@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
 import Hackathons from "@/components/Hackathons";
@@ -14,46 +14,10 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ProjectCaseStudy from "@/components/ProjectCaseStudy";
 import { usePortfolio } from "@/context/PortfolioContext";
+import InitialPageSkeleton from "@/components/InitialPageSkeleton";
 
-type ProjectType = {
-  id: string | number;
-  title: string;
-  description: string;
-  image: string;
-  tags: string[];
-  imagePosition: string;
-  githubUrl?: string;
-};
-
-type HackathonType = {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  tags: string[];
-  imagePosition: string;
-  demoUrl?: string;
-  githubUrl?: string;
-};
-
-type BlogType = {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  tags: string[];
-  createdAt?: string;
-};
-
-const PortfolioContent = ({
-  projects,
-  hackathons,
-  blogs,
-}: {
-  projects: ProjectType[];
-  hackathons: HackathonType[];
-  blogs: BlogType[];
-}) => {
+const PortfolioContent = () => {
+  const [isMounted, setIsMounted] = useState(false);
   const {
     activeSection,
     selectedProjectId,
@@ -64,16 +28,24 @@ const PortfolioContent = ({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     scrollRef.current?.scrollTo(0, 0);
   }, [activeSection, selectedProjectId, selectedHackathonId, selectedBlogId]);
+
+  if (!isMounted) {
+    return <InitialPageSkeleton />;
+  }
 
   if (isMobile) {
     return (
       <>
         <Hero />
-        <Projects projects={projects} />
-        <Hackathons hackathons={hackathons} />
-        <Blogs blogs={blogs} />
+        <Projects />
+        <Hackathons />
+        <Blogs />
         <Experience />
         <Skills />
         <Services />
@@ -90,19 +62,19 @@ const PortfolioContent = ({
         (selectedProjectId ? (
           <ProjectCaseStudy projectId={selectedProjectId} />
         ) : (
-          <Projects projects={projects} />
+          <Projects />
         ))}
       {activeSection === "hackathons" &&
         (selectedHackathonId ? (
           <HackathonDetail hackathonId={selectedHackathonId} />
         ) : (
-          <Hackathons hackathons={hackathons} />
+          <Hackathons />
         ))}
       {activeSection === "blogs" &&
         (selectedBlogId ? (
           <BlogDetail blogId={selectedBlogId} />
         ) : (
-          <Blogs blogs={blogs} />
+          <Blogs />
         ))}
       {activeSection === "experience" && <Experience />}
       {activeSection === "skills" && <Skills />}

@@ -8,6 +8,8 @@ import { PlusCircle } from "lucide-react";
 import ProjectActions from "@/components/admin/ProjectActions";
 import HackathonActions from "@/components/admin/HackathonActions";
 import BlogActions from "@/components/admin/BlogActions";
+import AdminProfileForm from "@/components/admin/AdminProfileForm";
+import AdminExperienceManager from "@/components/admin/AdminExperienceManager";
 
 export const dynamic = 'force-dynamic';
 
@@ -36,11 +38,11 @@ export default async function AdminDashboard({
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-serif">Admin Dashboard</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage your portfolio projects, hackathons, and blogs.</p>
+          <p className="text-sm text-muted-foreground mt-1">Manage your portfolio projects, hackathons, blogs, profile, and work experience.</p>
         </div>
 
         {/* Tab Switcher Links */}
-        <div className="flex rounded-lg border border-border bg-card p-1 self-start">
+        <div className="flex flex-wrap rounded-lg border border-border bg-card p-1 self-start gap-1">
           <Button
             asChild
             variant={activeTab === "projects" ? "default" : "ghost"}
@@ -65,8 +67,30 @@ export default async function AdminDashboard({
           >
             <Link href="/admin?tab=blogs">Blogs</Link>
           </Button>
+          <Button
+            asChild
+            variant={activeTab === "profile" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
+          >
+            <Link href="/admin?tab=profile">Profile</Link>
+          </Button>
+          <Button
+            asChild
+            variant={activeTab === "experience" ? "default" : "ghost"}
+            size="sm"
+            className="rounded-md"
+          >
+            <Link href="/admin?tab=experience">Experience</Link>
+          </Button>
         </div>
       </div>
+
+      {/* Profile Tab */}
+      {activeTab === "profile" && <AdminProfileForm />}
+
+      {/* Experience Tab */}
+      {activeTab === "experience" && <AdminExperienceManager />}
 
       {/* Projects Tab */}
       {activeTab === "projects" && (

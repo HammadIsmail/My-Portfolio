@@ -4,6 +4,16 @@ import Project from '@/models/Project';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { verifyToken } from '@/lib/auth';
 
+export async function GET() {
+  try {
+    await connectDB();
+    const projects = await Project.find({}).sort({ createdAt: -1 });
+    return NextResponse.json({ projects });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     // 1. Verify Authentication

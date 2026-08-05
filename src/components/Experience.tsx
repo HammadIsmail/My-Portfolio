@@ -1,98 +1,81 @@
 "use client";
-import { MapPin, Calendar } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MapPin, Calendar, Loader2 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { usePortfolio } from "@/context/PortfolioContext";
+
+type ExperienceItem = {
+  id?: string;
+  role: string;
+  company: string;
+  location: string;
+  workType: string;
+  period: string;
+  description: string;
+  visible?: boolean;
+};
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { useExperiencesQuery } from "@/hooks/usePortfolioQueries";
 
 const Experience = () => {
   const { ref, isVisible } = useScrollAnimation();
   const { isMobile } = usePortfolio();
-
-  const experiences = [
-    {
-      role: "Junior Full Stack Developer",
-      company: "Infoquestpro",
-      location: "Poland",
-      workType: "Remote",
-      period: "2025 - Present",
-      description: "Transitioned to advanced development role working with microservices architecture and distributed systems. Building and maintaining independent services using modern tech stack, implementing inter-service communication, and contributing to large-scale application ecosystems."
-    },
-    {
-      role: "Junior Full Stack Developer",
-      company: "Hive Technologies",
-      location: "Pakistan",
-      workType: "Hybrid",
-      period: "2025 - 3 Months",
-      description: "Promoted from intern to full-time developer, taking ownership of feature development and maintenance across multiple client projects. Built scalable web applications using React, Next.js, and Node.js/Express, while collaborating with cross-functional teams to deliver high-quality solutions on schedule."
-    },
-    {
-      role: "Full-Stack Intern",
-      company: "Hive Technologies",
-      location: "Pakistan",
-      workType: "Onsite",
-      period: "2025 - 3 Months",
-      description: "Contributed to live production applications serving real users, developing features using React, Next.js, and Node.js with Express. Gained hands-on experience in full-stack development within an enterprise environment, collaborating on client-facing projects and learning industry best practices."
-    }
-  ];
+  const { data: experiences, isLoading } = useExperiencesQuery();
+  const experienceList = experiences || [];
 
   return (
     <section
       ref={ref}
       id="experience"
-      className={isMobile ? "py-12 sm:py-16 lg:py-20" : "py-6"}
+      className={isMobile ? "py-12 sm:py-16" : "py-8"}
     >
-      <div className="container mx-auto px-4 sm:px-6">
-        {isMobile && (
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">
-            Experience
-          </h2>
-        )}
+      <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 font-serif">
+          Experience
+        </h2>
 
-        <div className={`max-w-4xl mx-auto relative ${isMobile ? "space-y-6" : ""}`}>
-          {experiences.map((exp, index) => (
-            <div
-              key={index}
-              className={isMobile ? "" : "sticky top-4"}
-              style={
-                isMobile
-                  ? undefined
-                  : {
-                      zIndex: index + 1,
-                      paddingBottom: index === experiences.length - 1 ? "0" : "1.5rem",
-                    }
-              }
-            >
+        {isLoading && !experiences ? (
+          <div className="max-w-4xl mx-auto space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-card rounded-3xl p-6 sm:p-8 border border-border space-y-4">
+                <Skeleton className="h-6 w-1/3" />
+                <Skeleton className="h-5 w-1/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : experienceList.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No experiences available to display.
+          </div>
+        ) : (
+          <div className="space-y-8 sm:space-y-12">
+            {experienceList.map((exp, index) => (
               <div
-                className={`bg-card rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-hover)] transition-all duration-700 border border-border ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                key={exp.id || index}
+                className={`bg-card rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-border flex flex-col space-y-4 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
-                style={{
-                  transitionDelay: `${index * 150}ms`,
-                  transform:
-                    isVisible && !isMobile
-                      ? `scale(${1 - index * 0.02})`
-                      : isVisible
-                        ? undefined
-                        : "translateY(40px)",
-                  transformOrigin: "top center",
-                }}
               >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-2">
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
                       {exp.role}
                     </h3>
-                    <p className="text-lg sm:text-xl font-semibold text-primary mb-2">
+                    <p className="text-lg sm:text-xl font-semibold text-primary">
                       {exp.company}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
-                    <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                    <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-primary/10 text-primary font-medium">
                       {exp.workType}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 sm:gap-4 mb-4 text-sm sm:text-base text-muted-foreground">
+                <div className="flex flex-wrap gap-3 sm:gap-4 text-sm sm:text-base text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     <span>{exp.location}</span>
@@ -103,13 +86,13 @@ const Experience = () => {
                   </div>
                 </div>
 
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed pt-2">
                   {exp.description}
                 </p>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
