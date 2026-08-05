@@ -14,7 +14,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import ProjectCaseStudy from "@/components/ProjectCaseStudy";
 import { usePortfolio } from "@/context/PortfolioContext";
-import InitialPageSkeleton from "@/components/InitialPageSkeleton";
+// import InitialPageSkeleton from "@/components/InitialPageSkeleton";
 
 const PortfolioContent = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -35,9 +35,9 @@ const PortfolioContent = () => {
     scrollRef.current?.scrollTo(0, 0);
   }, [activeSection, selectedProjectId, selectedHackathonId, selectedBlogId]);
 
-  if (!isMounted) {
-    return <InitialPageSkeleton />;
-  }
+  // if (!isMounted) {
+  //   return <InitialPageSkeleton />;
+  // }
 
   if (isMobile) {
     return (
