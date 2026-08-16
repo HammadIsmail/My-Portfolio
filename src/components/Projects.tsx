@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { useProjectsQuery } from "@/hooks/usePortfolioQueries";
 
+import { AnimatedCardShowcase } from "@/components/AnimatedCardShowcase";
+
 const Projects = () => {
   const { ref, isVisible } = useScrollAnimation();
   const router = useRouter();
@@ -20,7 +22,7 @@ const Projects = () => {
     return (
       <section id="projects" className={isMobile ? "py-12 sm:py-16" : "py-6"}>
         <div className="container mx-auto px-4 sm:px-6 space-y-6 max-w-4xl">
-          {[1, 2].map((i) => (
+          {[1].map((i) => (
             <div key={i} className="bg-card border border-border rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
               <Skeleton className="h-64 sm:h-80 w-full rounded-2xl" />
               <Skeleton className="h-8 w-3/4" />
@@ -41,7 +43,7 @@ const Projects = () => {
   return (
     <section ref={ref} id="projects" className={isMobile ? "py-12 sm:py-16" : "py-8"}>
       <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 font-serif">
+        <h2 className="block md:hidden text-3xl sm:text-4xl font-bold text-center mb-8 font-serif">
           Projects
         </h2>
 
@@ -50,72 +52,71 @@ const Projects = () => {
             No projects posted yet.
           </div>
         ) : (
-          <div className="space-y-8 sm:space-y-12">
-            {projectList.map((project) => (
-              <Card
-                key={project.id}
-                className={`overflow-hidden border border-border/60 shadow-lg hover:shadow-2xl transition-all duration-500 bg-card rounded-3xl p-6 sm:p-8 flex flex-col space-y-6 ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                }`}
-              >
-                {/* Cover Image at top */}
-                <div className="w-full relative aspect-[16/10] sm:aspect-video rounded-2xl overflow-hidden bg-black/40 flex items-center justify-center p-3 sm:p-6 border border-border/40 shadow-sm">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-contain max-h-[460px] rounded-lg shadow-sm"
-                  />
-                </div>
+          <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <AnimatedCardShowcase
+              items={projectList}
+              getItemKey={(project) => project.id}
+              renderItem={(project) => (
+                <div
+                  className="neo-raised neo-raised-hover rounded-3xl p-6 sm:p-8 flex flex-col space-y-6 w-full"
+                >
+                  {/* Cover Image at top */}
+                  <div className="w-full relative aspect-[16/10] sm:aspect-video rounded-2xl overflow-hidden neo-inset flex items-center justify-center p-3 sm:p-6">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-contain max-h-[460px] rounded-xl"
+                    />
+                  </div>
 
-                {/* Title */}
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif leading-tight text-foreground">
-                  {project.title}
-                </h3>
+                  {/* Title */}
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif leading-tight text-foreground">
+                    {project.title}
+                  </h3>
 
-                {/* Description */}
-                <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
-                  {project.description}
-                </p>
+                  {/* Description */}
+                  <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+                    {project.description}
+                  </p>
 
-                {/* Golden Pill Tags */}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-[#EAB308] dark:bg-[#FACC15] text-black font-semibold shadow-sm"
+                  {/* Golden Pill Tags */}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs sm:text-sm px-3.5 py-1.5 rounded-full neo-pill-accent font-semibold"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Stacked Full-Width Pill Buttons */}
+                  <div className="flex flex-col gap-3 pt-4 w-full">
+                    <button
+                      className="w-full rounded-2xl py-3.5 px-6 text-base font-semibold neo-button-primary touch-manipulation"
+                      onClick={() =>
+                        isMobile
+                          ? router.push(`/project/${project.id}`)
+                          : openCaseStudy(String(project.id))
+                      }
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Stacked Full-Width Pill Buttons */}
-                <div className="flex flex-col gap-3 pt-4 w-full">
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-full border-2 border-foreground/30 py-6 text-base font-medium hover:bg-foreground hover:text-background transition-all"
-                    onClick={() =>
-                      isMobile
-                        ? router.push(`/project/${project.id}`)
-                        : openCaseStudy(String(project.id))
-                    }
-                  >
-                    View Case Study
-                  </Button>
-                  {project.githubUrl && (
-                    <Button
-                      variant="outline"
-                      className="w-full rounded-full border-2 border-foreground/30 py-6 text-base font-medium hover:bg-foreground hover:text-background transition-all"
-                      asChild
-                    >
-                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                      View Case Study
+                    </button>
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full text-center rounded-2xl py-3.5 px-6 text-base font-medium neo-button touch-manipulation"
+                      >
                         Github Repo
                       </a>
-                    </Button>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </Card>
-            ))}
+              )}
+            />
           </div>
         )}
       </div>

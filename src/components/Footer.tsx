@@ -18,7 +18,7 @@ const Footer = () => {
               href={social.link}
               target="_blank"
               rel="noopener noreferrer"
-              className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-foreground text-background ${social.color} transition-all duration-300 touch-manipulation`}
+              className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full neo-button text-foreground hover:text-primary transition-all duration-300 touch-manipulation"
               aria-label={social.icon.split(':')[1]}
             >
               <Icon icon={social.icon} className="w-5 h-5 sm:w-6 sm:h-6" />

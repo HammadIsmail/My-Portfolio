@@ -28,26 +28,20 @@ const Services = () => {
       aria-labelledby={isMobile ? "services-heading" : undefined}
     >
       <div className="container mx-auto px-4 sm:px-6">
-        {isMobile && (
-          <motion.header
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="mb-8 text-center sm:mb-12 lg:mb-16"
+        <header
+          className="block md:hidden mb-8 text-center sm:mb-12 font-serif"
+        >
+          <h2
+            id="services-heading"
+            className="text-3xl font-bold sm:text-4xl"
           >
-            <h2
-              id="services-heading"
-              className="text-3xl font-bold sm:text-4xl lg:text-5xl"
-            >
-              Services
-            </h2>
-            <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base lg:text-lg">
-              Building scalable web applications, AI-powered solutions, and cross-platform
-              mobile experiences.
-            </p>
-          </motion.header>
-        )}
+            Services
+          </h2>
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
+            Building scalable web applications, AI-powered solutions, and cross-platform
+            mobile experiences.
+          </p>
+        </header>
 
         <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
           {services.map((service, index) => (

@@ -31,7 +31,7 @@ const Experience = () => {
       className={isMobile ? "py-12 sm:py-16" : "py-8"}
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 font-serif">
+        <h2 className="block md:hidden text-3xl sm:text-4xl font-bold text-center mb-8 font-serif">
           Experience
         </h2>
 
@@ -55,13 +55,13 @@ const Experience = () => {
             {experienceList.map((exp, index) => (
               <div
                 key={exp.id || index}
-                className={`bg-card rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-border flex flex-col space-y-4 ${
+                className={`neo-raised neo-raised-hover rounded-3xl p-6 sm:p-8 flex flex-col space-y-4 transition-all duration-500 ${
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-2">
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
+                    <h3 className="text-xl sm:text-2xl font-bold font-serif text-foreground mb-1">
                       {exp.role}
                     </h3>
                     <p className="text-lg sm:text-xl font-semibold text-primary">
@@ -69,19 +69,19 @@ const Experience = () => {
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
-                    <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-primary/10 text-primary font-medium">
+                    <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3.5 py-1.5 rounded-full neo-inset-sm text-primary font-semibold">
                       {exp.workType}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 sm:gap-4 text-sm sm:text-base text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
+                <div className="flex flex-wrap gap-3 text-xs sm:text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 neo-raised-sm px-3 py-1.5 rounded-xl">
+                    <MapPin className="w-4 h-4 text-primary" />
                     <span>{exp.location}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
+                  <div className="flex items-center gap-2 neo-raised-sm px-3 py-1.5 rounded-xl">
+                    <Calendar className="w-4 h-4 text-primary" />
                     <span>{exp.period}</span>
                   </div>
                 </div>

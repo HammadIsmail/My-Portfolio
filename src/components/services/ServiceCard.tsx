@@ -45,14 +45,12 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       viewport={{ once: true, margin: "-40px" }}
       className="h-full"
     >
-      <Card
+      <div
         className={cn(
-          "group flex h-full min-h-[460px] flex-col overflow-hidden rounded-2xl border border-border bg-card",
-          "shadow-[var(--shadow-card)] transition-all duration-300",
-          "hover:shadow-[var(--shadow-hover)] hover:border-primary/20"
+          "group flex h-full min-h-[440px] flex-col overflow-hidden rounded-3xl neo-raised neo-raised-hover transition-all duration-300"
         )}
       >
-        <div className="relative flex min-h-[160px] flex-[0.45] items-center justify-center px-6 pt-8 pb-2">
+        <div className="relative flex min-h-[160px] flex-[0.45] items-center justify-center m-4 p-4 neo-inset rounded-2xl">
           <motion.div
             animate={imageFloat}
             className="relative flex h-full w-full items-center justify-center"
@@ -60,7 +58,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
             <motion.img
               src={service.image}
               alt={service.imageAlt}
-              className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+              className="max-h-36 max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
               whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               draggable={false}
@@ -69,7 +67,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
         </div>
 
         <div className="flex flex-1 flex-col px-6 pb-6 pt-2 sm:px-8 sm:pb-8">
-          <h3 className="text-xl font-bold text-foreground sm:text-2xl">
+          <h3 className="text-xl font-bold font-serif text-foreground sm:text-2xl">
             {service.title}
           </h3>
           <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground sm:text-base">
@@ -82,14 +80,14 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           >
             {service.technologies.map((tech) => (
               <li key={tech}>
-                <span className="inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors duration-200 hover:bg-primary/15">
+                <span className="inline-block rounded-full neo-inset-sm px-3 py-1 text-xs font-semibold text-primary">
                   {tech}
                 </span>
               </li>
             ))}
           </ul>
         </div>
-      </Card>
+      </div>
     </motion.div>
   );
 };

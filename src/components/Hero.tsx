@@ -55,7 +55,7 @@ const Hero = () => {
       <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
         <div
           ref={ref}
-          className={`bg-card border rounded-2xl shadow-sm overflow-hidden transition-all duration-700 ${
+          className={`neo-raised rounded-3xl overflow-hidden transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
@@ -65,7 +65,7 @@ const Hero = () => {
             onClick={() =>
               setPreviewImage({ src: activeProfile.coverImage, alt: "Cover image" })
             }
-            className="relative block h-48 sm:h-64 md:h-80 w-full bg-muted cursor-zoom-in group"
+            className="relative block h-48 sm:h-64 md:h-80 w-full neo-inset cursor-zoom-in group overflow-hidden"
             aria-label="Preview cover image"
           >
             <img
@@ -89,62 +89,63 @@ const Hero = () => {
                     rounded: true,
                   })
                 }
-                className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-card bg-background overflow-hidden shrink-0 cursor-zoom-in group"
+                className="relative z-10 w-32 h-32 sm:w-40 sm:h-40 rounded-full neo-raised p-1.5 overflow-hidden shrink-0 cursor-zoom-in group"
                 aria-label="Preview profile image"
               >
                 <img
                   src={activeProfile.profileImage}
                   alt={activeProfile.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
                 />
               </button>
 
               {/* Action Buttons */}
               <div className="flex flex-nowrap gap-2 sm:gap-3 mt-4 sm:mt-0 sm:ml-4 w-full sm:w-auto self-start sm:self-end">
-                <Button onClick={goToProjects} className="flex-1 sm:flex-none min-w-0 px-3 sm:min-w-[100px] text-xs sm:text-sm">
+                <button 
+                  onClick={goToProjects} 
+                  className="flex-1 sm:flex-none min-w-0 px-4 py-2.5 sm:min-w-[110px] text-xs sm:text-sm font-semibold neo-button-primary rounded-xl touch-manipulation"
+                >
                   Projects
-                </Button>
+                </button>
                 {activeProfile.linkedinUrl && (
-                  <Button variant="outline" asChild className="flex-1 sm:flex-none min-w-0 px-3 text-xs sm:text-sm">
-                    <a
-                      href={activeProfile.linkedinUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5"
-                    >
-                      <Icon icon="lucide:linkedin" className="w-4 h-4" />
-                      LinkedIn
-                    </a>
-                  </Button>
+                  <a
+                    href={activeProfile.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 sm:flex-none min-w-0 px-4 py-2.5 text-xs sm:text-sm font-medium neo-button rounded-xl inline-flex items-center justify-center gap-1.5 touch-manipulation"
+                  >
+                    <Icon icon="lucide:linkedin" className="w-4 h-4 text-primary" />
+                    LinkedIn
+                  </a>
                 )}
                 {activeProfile.githubUrl && (
-                  <Button variant="outline" asChild className="flex-1 sm:flex-none min-w-0 px-3 text-xs sm:text-sm">
-                    <a
-                      href={activeProfile.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5"
-                    >
-                      <Icon icon="lucide:github" className="w-4 h-4" />
-                      Github
-                    </a>
-                  </Button>
+                  <a
+                    href={activeProfile.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 sm:flex-none min-w-0 px-4 py-2.5 text-xs sm:text-sm font-medium neo-button rounded-xl inline-flex items-center justify-center gap-1.5 touch-manipulation"
+                  >
+                    <Icon icon="lucide:github" className="w-4 h-4 text-primary" />
+                    Github
+                  </a>
                 )}
               </div>
             </div>
 
             {/* Profile Info */}
-            <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+            <div className="mt-2">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight font-serif text-foreground">
                 {activeProfile.name}
               </h1>
-              <p className="text-sm sm:text-base font-semibold text-primary mt-1">
-                {activeProfile.title}
-              </p>
+              <div className="inline-block mt-2 px-3 py-1 neo-inset-sm rounded-full">
+                <p className="text-xs sm:text-sm font-semibold text-primary">
+                  {activeProfile.title}
+                </p>
+              </div>
             </div>
 
             {/* Bio */}
-            <div className="mt-6 text-base sm:text-lg text-muted-foreground space-y-4 max-w-4xl">
+            <div className="mt-6 text-base sm:text-lg text-muted-foreground space-y-4 max-w-4xl leading-relaxed">
               {activeProfile.bio.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}

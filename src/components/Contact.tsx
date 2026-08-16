@@ -70,10 +70,10 @@ const Contact = () => {
   return (
     <section id="contact" className="py-12 sm:py-16 lg:py-20 bg-background">
       <div className="container mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">Contact</h2>
-        <div ref={ref} className={`max-w-xl mx-auto transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <h2 className="block md:hidden text-3xl sm:text-4xl font-bold font-serif text-center mb-8">Contact</h2>
+        <div ref={ref} className={`max-w-xl mx-auto neo-raised rounded-3xl p-6 sm:p-10 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <Form {...form}>
-            <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+            <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
               <FormField
                 control={form.control}
                 name="name"
@@ -84,7 +84,7 @@ const Contact = () => {
                         placeholder="Name"
                         {...field}
                         disabled={form.formState.isSubmitting}
-                        className="h-12 sm:h-14 bg-card border-border text-base"
+                        className="h-12 sm:h-14 neo-input rounded-2xl px-4 text-base placeholder:text-muted-foreground/60 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
                     </FormControl>
                     <FormMessage />
@@ -103,7 +103,7 @@ const Contact = () => {
                         placeholder="Email"
                         {...field}
                         disabled={form.formState.isSubmitting}
-                        className="h-12 sm:h-14 bg-card border-border text-base"
+                        className="h-12 sm:h-14 neo-input rounded-2xl px-4 text-base placeholder:text-muted-foreground/60 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
                     </FormControl>
                     <FormMessage />
@@ -121,7 +121,7 @@ const Contact = () => {
                         placeholder="Message"
                         {...field}
                         disabled={form.formState.isSubmitting}
-                        className="min-h-[150px] sm:min-h-[180px] bg-card border-border resize-none text-base"
+                        className="min-h-[150px] sm:min-h-[180px] neo-input rounded-2xl p-4 resize-none text-base placeholder:text-muted-foreground/60 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
                     </FormControl>
                     <FormMessage />
@@ -130,10 +130,9 @@ const Contact = () => {
               />
               
               <div className="text-center pt-2">
-                <Button 
+                <button 
                   type="submit" 
-                  size="lg" 
-                  className="w-full sm:w-auto sm:px-12 min-h-[48px]"
+                  className="w-full sm:w-auto sm:px-12 py-3.5 neo-button-primary rounded-2xl min-h-[48px] text-base font-semibold inline-flex items-center justify-center transition-all touch-manipulation disabled:opacity-50"
                   disabled={form.formState.isSubmitting}
                 >
                   {form.formState.isSubmitting ? (
@@ -144,7 +143,7 @@ const Contact = () => {
                   ) : (
                     "Send"
                   )}
-                </Button>
+                </button>
               </div>
             </form>
           </Form>

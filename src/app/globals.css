@@ -10,23 +10,23 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 15%;
+    --background: 215 28% 93%;
+    --foreground: 215 25% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 15%;
+    --card: 215 28% 93%;
+    --card-foreground: 215 25% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 15%;
+    --popover: 215 28% 93%;
+    --popover-foreground: 215 25% 15%;
 
     --primary: 45 100% 51%;
     --primary-foreground: 0 0% 15%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 15%;
+    --secondary: 215 20% 90%;
+    --secondary-foreground: 215 25% 15%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 215 20% 90%;
+    --muted-foreground: 215 15% 45%;
 
     --accent: 45 100% 51%;
     --accent-foreground: 0 0% 15%;
@@ -34,50 +34,57 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 215 20% 86%;
+    --input: 215 20% 88%;
     --ring: 45 100% 51%;
 
     --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 15%;
+    --sidebar-background: 215 28% 93%;
+    --sidebar-foreground: 215 25% 15%;
     --sidebar-primary: 45 100% 51%;
     --sidebar-primary-foreground: 0 0% 15%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 0 0% 90%;
+    --sidebar-accent: 215 20% 90%;
+    --sidebar-accent-foreground: 215 25% 15%;
+    --sidebar-border: 215 20% 86%;
     --sidebar-ring: 45 100% 51%;
+
+    /* Neomorphism Shadow Tokens Light */
+    --neo-shadow-raised: -7px -7px 16px rgba(255, 255, 255, 0.85), 7px 7px 16px rgba(165, 180, 202, 0.45);
+    --neo-shadow-raised-sm: -4px -4px 10px rgba(255, 255, 255, 0.85), 4px 4px 10px rgba(165, 180, 202, 0.45);
+    --neo-shadow-raised-hover: -9px -9px 22px rgba(255, 255, 255, 0.95), 9px 9px 22px rgba(165, 180, 202, 0.55);
+    --neo-shadow-inset: inset 4px 4px 8px rgba(165, 180, 202, 0.45), inset -4px -4px 8px rgba(255, 255, 255, 0.85);
+    --neo-shadow-inset-sm: inset 2px 2px 5px rgba(165, 180, 202, 0.4), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
 
     /* Custom portfolio tokens */
     --hero-accent: 45 100% 51%;
-    --text-heading: 0 0% 15%;
-    --text-body: 0 0% 40%;
+    --text-heading: 215 25% 15%;
+    --text-body: 215 15% 35%;
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.18);
-    --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.24);
+    --shadow-card: var(--neo-shadow-raised);
+    --shadow-hover: var(--neo-shadow-raised-hover);
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 98%;
+    --background: 220 22% 13%;
+    --foreground: 215 20% 95%;
 
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 220 22% 13%;
+    --card-foreground: 215 20% 95%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 220 22% 13%;
+    --popover-foreground: 215 20% 95%;
 
     --primary: 45 100% 51%;
     --primary-foreground: 0 0% 15%;
 
-    --secondary: 0 0% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 220 18% 18%;
+    --secondary-foreground: 215 20% 95%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 220 18% 18%;
+    --muted-foreground: 215 15% 65%;
 
     --accent: 45 100% 51%;
     --accent-foreground: 0 0% 15%;
@@ -85,24 +92,31 @@ All colors MUST be HSL.
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
     --ring: 45 100% 51%;
     
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-background: 220 22% 13%;
+    --sidebar-foreground: 215 20% 95%;
     --sidebar-primary: 45 100% 51%;
     --sidebar-primary-foreground: 0 0% 15%;
-    --sidebar-accent: 0 0% 20%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 20%;
+    --sidebar-accent: 220 18% 18%;
+    --sidebar-accent-foreground: 215 20% 95%;
+    --sidebar-border: 220 15% 18%;
     --sidebar-ring: 45 100% 51%;
 
+    /* Neomorphism Shadow Tokens Dark */
+    --neo-shadow-raised: -6px -6px 14px rgba(38, 46, 60, 0.6), 6px 6px 14px rgba(12, 15, 21, 0.75);
+    --neo-shadow-raised-sm: -3px -3px 8px rgba(38, 46, 60, 0.6), 3px 3px 8px rgba(12, 15, 21, 0.75);
+    --neo-shadow-raised-hover: -8px -8px 18px rgba(38, 46, 60, 0.7), 8px 8px 18px rgba(12, 15, 21, 0.85);
+    --neo-shadow-inset: inset 4px 4px 8px rgba(10, 13, 18, 0.8), inset -4px -4px 8px rgba(40, 49, 64, 0.5);
+    --neo-shadow-inset-sm: inset 2px 2px 5px rgba(10, 13, 18, 0.75), inset -2px -2px 5px rgba(40, 49, 64, 0.45);
+
     --hero-accent: 45 100% 51%;
-    --text-heading: 0 0% 98%;
-    --text-body: 0 0% 70%;
-    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
-    --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+    --text-heading: 215 20% 95%;
+    --text-body: 215 15% 75%;
+    --shadow-card: var(--neo-shadow-raised);
+    --shadow-hover: var(--neo-shadow-raised-hover);
   }
 }
 
@@ -124,8 +138,129 @@ All colors MUST be HSL.
   p {
     color: hsl(var(--text-body));
   }
+}
 
+@layer components {
+  .neo-surface {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+  }
 
+  .neo-raised {
+    background-color: hsl(var(--card));
+    box-shadow: var(--neo-shadow-raised);
+    border: 1px solid hsl(var(--border) / 0.5);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-raised-sm {
+    background-color: hsl(var(--card));
+    box-shadow: var(--neo-shadow-raised-sm);
+    border: 1px solid hsl(var(--border) / 0.4);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-raised-hover {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-raised-hover:hover {
+    box-shadow: var(--neo-shadow-raised-hover);
+    transform: translateY(-2px);
+  }
+
+  .neo-inset {
+    background-color: hsl(var(--card));
+    box-shadow: var(--neo-shadow-inset);
+    border: 1px solid hsl(var(--border) / 0.3);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-inset-sm {
+    background-color: hsl(var(--card));
+    box-shadow: var(--neo-shadow-inset-sm);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .neo-button {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    box-shadow: var(--neo-shadow-raised-sm);
+    border: 1px solid hsl(var(--border) / 0.5);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-button:hover {
+    box-shadow: var(--neo-shadow-raised-hover);
+    transform: translateY(-1px);
+    color: hsl(var(--primary));
+  }
+
+  .neo-button:active, .neo-button-active {
+    box-shadow: var(--neo-shadow-inset-sm) !important;
+    transform: translateY(1px) !important;
+  }
+
+  .neo-button-primary {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--neo-shadow-raised-sm);
+    border: 1px solid hsl(var(--primary) / 0.8);
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neo-button-primary:hover {
+    box-shadow: var(--neo-shadow-raised-hover);
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  .neo-button-primary:active {
+    box-shadow: var(--neo-shadow-inset-sm);
+    transform: translateY(1px);
+  }
+
+  .neo-input {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    box-shadow: var(--neo-shadow-inset);
+    border: 1px solid hsl(var(--border) / 0.4);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .neo-input:focus {
+    outline: none;
+    box-shadow: var(--neo-shadow-inset), 0 0 0 2px hsl(var(--ring) / 0.6);
+    border-color: hsl(var(--ring));
+  }
+
+  .neo-pill {
+    box-shadow: var(--neo-shadow-raised-sm);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  .neo-pill-accent {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--neo-shadow-raised-sm);
+  }
+
+  .neo-icon-box {
+    background-color: hsl(var(--card));
+    box-shadow: var(--neo-shadow-raised-sm);
+    border: 1px solid hsl(var(--border) / 0.4);
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+    width: 0px;
+    height: 0px;
+  }
 }
 
 @keyframes bounce-subtle {

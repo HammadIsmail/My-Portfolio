@@ -62,28 +62,26 @@ const Skills = () => {
       className={isMobile ? "py-12 sm:py-16 lg:py-20 bg-muted/30" : "py-6 bg-muted/30"}
     >
       <div className="container mx-auto px-4 sm:px-6">
-        {isMobile && (
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 lg:mb-16">
-            Skills
-          </h2>
-        )}
+        <h2 className="block md:hidden text-3xl sm:text-4xl font-bold text-center mb-8 font-serif">
+          Skills
+        </h2>
 
         {/* Skills Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {skills.map((skill, index) => (
             <div
               key={skill.name}
-              className={`flex flex-col items-center p-4 sm:p-6 rounded-2xl bg-card hover:shadow-[var(--shadow-hover)] transition-all duration-300 ${
+              className={`flex flex-col items-center p-4 sm:p-6 rounded-2xl neo-raised-sm neo-raised-hover transition-all duration-300 ${
                 isVisible ? "animate-fade-in" : "opacity-0"
               }`}
               style={{
                 animationDelay: isVisible ? `${index * 50}ms` : "0ms",
               }}
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center mb-3">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center p-2.5 rounded-2xl neo-inset-sm mb-3">
                 <Icon icon={skill.icon} className="w-full h-full" />
               </div>
-              <h3 className="text-xs sm:text-sm font-semibold text-center">
+              <h3 className="text-xs sm:text-sm font-semibold text-center text-foreground">
                 {skill.name}
               </h3>
             </div>
@@ -92,24 +90,24 @@ const Skills = () => {
 
         {/* Tools Section */}
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8">
+          <h3 className="text-2xl sm:text-3xl font-bold font-serif text-center mb-6 sm:mb-8 text-foreground">
             Tools
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
             {tools.map((tool, index) => (
               <div
                 key={tool.name}
-                className={`flex flex-col items-center p-4 sm:p-6 rounded-2xl bg-card hover:shadow-[var(--shadow-hover)] transition-all duration-300 ${
+                className={`flex flex-col items-center p-4 sm:p-6 rounded-2xl neo-raised-sm neo-raised-hover transition-all duration-300 ${
                   isVisible ? "animate-fade-in" : "opacity-0"
                 }`}
                 style={{
                   animationDelay: isVisible ? `${(skills.length + index) * 50}ms` : "0ms",
                 }}
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mb-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center p-2 rounded-xl neo-inset-sm mb-3">
                   <Icon icon={tool.icon} className="w-full h-full" />
                 </div>
-                <h3 className="text-xs sm:text-sm font-semibold text-center">
+                <h3 className="text-xs sm:text-sm font-semibold text-center text-foreground">
                   {tool.name}
                 </h3>
               </div>
