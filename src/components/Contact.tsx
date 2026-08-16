@@ -78,7 +78,7 @@ const Contact = () => {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
+                 <FormItem>
                     <FormControl>
                       <Input
                         placeholder="Name"

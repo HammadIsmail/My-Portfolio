@@ -4,16 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function InitialPageSkeleton() {
   return (
-    <div className="w-full min-h-screen bg-background text-foreground flex flex-col lg:flex-row overflow-hidden animate-pulse">
-      {/* Sidebar Skeleton (Desktop) */}
-      <div className="hidden lg:flex flex-col w-64 border-r border-border/40 p-6 space-y-8 shrink-0 bg-card neo-raised">
-        <Skeleton className="h-8 w-36 rounded-xl neo-inset-sm" />
-        <div className="space-y-4 pt-4">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-10 w-full rounded-xl neo-inset-sm" />
-          ))}
-        </div>
-      </div>
+    <div className="w-full min-h-screen bg-background text-foreground flex flex-col overflow-hidden animate-pulse">
 
       {/* Main Content Area Skeleton */}
       <div className="flex-1 p-4 sm:p-6 lg:p-8 space-y-8 overflow-y-auto max-w-5xl mx-auto w-full">
