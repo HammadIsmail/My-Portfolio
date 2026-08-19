@@ -11,7 +11,7 @@ This is a personal portfolio website with a custom admin panel for managing dyna
   - **Projects**: Display case studies with links to Live Demos and GitHub Repositories.
   - **Hackathons**: Detail participation in hackathons, learnings, demo URLs, and GitHub repos.
   - **Blogs**: Markdown/HTML based blogs detailing learnings or other topics.
-  - **Experience, Skills, Services, Contact**: Standard portfolio sections.
+  - **Experience, Skills, Tech Expertise, Contact**: Standard portfolio sections.
 - **Navigation**:
   - Desktop: Sidebar navigation on the left.
   - Mobile: Hamburger menu or vertical scroll for main sections.

@@ -275,3 +275,13 @@ All colors MUST be HSL.
 .animate-bounce-subtle {
   animation: bounce-subtle 2s ease-in-out infinite;
 }
+
+/* In dark mode, make the entire Kafka logo white */
+.dark [data-skill="Kafka"] svg path {
+  fill: #ffffff !important;
+}
+
+/* In dark mode, make only the text and outlines of Neo4j white (keeps the blue circle colors) */
+.dark [data-skill="Neo4j"] svg path:not([fill]) {
+  fill: #ffffff !important;
+}

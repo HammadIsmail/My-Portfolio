@@ -37,11 +37,10 @@ const Hero = () => {
   } | null>(null);
 
   const goToProjects = () => {
+    navigateToSection("projects");
     if (isMobile) {
       const element = document.getElementById("projects");
       element?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigateToSection("projects");
     }
   };
 

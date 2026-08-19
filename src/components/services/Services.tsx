@@ -35,7 +35,7 @@ const Services = () => {
             id="services-heading"
             className="text-3xl font-bold sm:text-4xl"
           >
-            Services
+            Tech Expertise
           </h2>
           <p className="mx-auto mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
             Building scalable web applications, AI-powered solutions, and cross-platform

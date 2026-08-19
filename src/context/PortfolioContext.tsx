@@ -5,6 +5,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 export type SectionId = "profile" | "projects" | "experience" | "skills" | "services" | "contact" | "hackathons" | "blogs";
 
+const VALID_SECTIONS: SectionId[] = ["profile", "projects", "hackathons", "blogs", "experience", "skills", "services", "contact"];
+
 export type ProjectType = {
   id: string;
   title: string;
@@ -65,6 +67,45 @@ type PortfolioContextValue = {
 
 const PortfolioContext = createContext<PortfolioContextValue | null>(null);
 
+// Helper to parse section & detail ID from current URL hash
+const parseHashState = (): { section: SectionId | null; detailId: string | null } => {
+  if (typeof window === "undefined") return { section: null, detailId: null };
+  const rawHash = window.location.hash.replace("#", "").trim();
+  if (!rawHash) return { section: null, detailId: null };
+
+  const [sectionPart, queryPart] = rawHash.split("?");
+  const section = VALID_SECTIONS.includes(sectionPart as SectionId) ? (sectionPart as SectionId) : null;
+  let detailId: string | null = null;
+  if (queryPart) {
+    const params = new URLSearchParams(queryPart);
+    detailId = params.get("id");
+  }
+  return { section, detailId };
+};
+
+// Helper to update URL hash & localStorage atomically
+const updateUrlHash = (section: SectionId, detailType?: "project" | "hackathon" | "blog", detailId?: string | null) => {
+  if (typeof window === "undefined") return;
+
+  let hashStr = `#${section}`;
+  if (detailType && detailId) {
+    hashStr += `?id=${encodeURIComponent(detailId)}`;
+  }
+
+  if (window.location.hash !== hashStr) {
+    window.history.replaceState(null, "", hashStr);
+  }
+
+  localStorage.setItem("portfolio_active_section", section);
+  if (detailId && detailType) {
+    localStorage.setItem(`portfolio_${detailType}_id`, detailId);
+  } else {
+    localStorage.removeItem("portfolio_project_id");
+    localStorage.removeItem("portfolio_hackathon_id");
+    localStorage.removeItem("portfolio_blog_id");
+  }
+};
+
 export function PortfolioProvider({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<SectionId>("profile");
@@ -82,11 +123,89 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [blogs, setBlogs] = useState<BlogType[] | null>(null);
   const [blogsLoading, setBlogsLoading] = useState(false);
 
+  // Sync state on client mount (handles reloads, direct URL entry, and localStorage fallback)
+  useEffect(() => {
+    const { section: hashSection, detailId } = parseHashState();
+    let targetSection: SectionId = "profile";
+    let projId: string | null = null;
+    let hackId: string | null = null;
+    let blogId: string | null = null;
+
+    if (hashSection) {
+      targetSection = hashSection;
+      if (hashSection === "projects" && detailId) projId = detailId;
+      if (hashSection === "hackathons" && detailId) hackId = detailId;
+      if (hashSection === "blogs" && detailId) blogId = detailId;
+    } else {
+      const savedSection = localStorage.getItem("portfolio_active_section") as SectionId | null;
+      if (savedSection && VALID_SECTIONS.includes(savedSection)) {
+        targetSection = savedSection;
+        if (savedSection === "projects") projId = localStorage.getItem("portfolio_project_id");
+        if (savedSection === "hackathons") hackId = localStorage.getItem("portfolio_hackathon_id");
+        if (savedSection === "blogs") blogId = localStorage.getItem("portfolio_blog_id");
+      }
+    }
+
+    setActiveSection(targetSection);
+    if (projId) setSelectedProjectId(projId);
+    if (hackId) setSelectedHackathonId(hackId);
+    if (blogId) setSelectedBlogId(blogId);
+
+    updateUrlHash(
+      targetSection,
+      projId ? "project" : hackId ? "hackathon" : blogId ? "blog" : undefined,
+      projId || hackId || blogId || undefined
+    );
+
+    // Smooth scroll on mobile if reloaded on non-profile section
+    if (isMobile && targetSection !== "profile") {
+      setTimeout(() => {
+        const el = document.getElementById(targetSection);
+        el?.scrollIntoView({ behavior: "smooth" });
+      }, 350);
+    }
+  }, [isMobile]);
+
+  // Sync state on browser back/forward (popstate/hashchange)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { section: hashSection, detailId } = parseHashState();
+      if (hashSection) {
+        setActiveSection(hashSection);
+        if (hashSection === "projects") {
+          setSelectedProjectId(detailId);
+          setSelectedHackathonId(null);
+          setSelectedBlogId(null);
+        } else if (hashSection === "hackathons") {
+          setSelectedHackathonId(detailId);
+          setSelectedProjectId(null);
+          setSelectedBlogId(null);
+        } else if (hashSection === "blogs") {
+          setSelectedBlogId(detailId);
+          setSelectedProjectId(null);
+          setSelectedHackathonId(null);
+        } else {
+          setSelectedProjectId(null);
+          setSelectedHackathonId(null);
+          setSelectedBlogId(null);
+        }
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    window.addEventListener("popstate", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("popstate", handleHashChange);
+    };
+  }, []);
+
   const navigateToSection = useCallback((section: SectionId) => {
     setActiveSection(section);
     setSelectedProjectId(null);
     setSelectedHackathonId(null);
     setSelectedBlogId(null);
+    updateUrlHash(section);
   }, []);
 
   const fetchProjectsIfNeeded = useCallback(async () => {
@@ -183,28 +302,34 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const openCaseStudy = useCallback((projectId: string) => {
     setActiveSection("projects");
     setSelectedProjectId(projectId);
+    updateUrlHash("projects", "project", projectId);
   }, []);
 
   const closeCaseStudy = useCallback(() => {
     setSelectedProjectId(null);
+    updateUrlHash("projects");
   }, []);
 
   const openHackathon = useCallback((hackathonId: string) => {
     setActiveSection("hackathons");
     setSelectedHackathonId(hackathonId);
+    updateUrlHash("hackathons", "hackathon", hackathonId);
   }, []);
 
   const closeHackathon = useCallback(() => {
     setSelectedHackathonId(null);
+    updateUrlHash("hackathons");
   }, []);
 
   const openBlog = useCallback((blogId: string) => {
     setActiveSection("blogs");
     setSelectedBlogId(blogId);
+    updateUrlHash("blogs", "blog", blogId);
   }, []);
 
   const closeBlog = useCallback(() => {
     setSelectedBlogId(null);
+    updateUrlHash("blogs");
   }, []);
 
   return (

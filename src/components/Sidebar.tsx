@@ -15,7 +15,7 @@ const navLinks: { id: SectionId; label: string }[] = [
   { id: "blogs", label: "Blogs" },
   { id: "experience", label: "Experience" },
   { id: "skills", label: "Skills" },
-  { id: "services", label: "Services" },
+  { id: "services", label: "Tech Expertise" },
   { id: "contact", label: "Contact" },
 ];
 
@@ -31,11 +31,10 @@ const Sidebar = () => {
       window.location.href = `/#${id}`;
       return;
     }
+    navigateToSection(id);
     if (isMobile) {
       const element = document.getElementById(id);
       element?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigateToSection(id);
     }
   };
 
