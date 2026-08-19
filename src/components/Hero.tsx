@@ -11,6 +11,8 @@ import { usePortfolio } from "@/context/PortfolioContext";
 import { Icon } from "@iconify/react";
 
 import { useProfileQuery } from "@/hooks/usePortfolioQueries";
+import Skills3DSphere from "@/components/Skills3DSphere";
+import { ALL_SKILLS } from "@/components/Skills";
 
 const DEFAULT_PROFILE = {
   name: "Muhammad Hammad",
@@ -59,24 +61,14 @@ const Hero = () => {
           }`}
         >
           {/* Cover Image */}
-          <button
-            type="button"
-            onClick={() =>
-              setPreviewImage({ src: activeProfile.coverImage, alt: "Cover image" })
-            }
-            className="relative block h-48 sm:h-64 md:h-80 w-full neo-inset cursor-zoom-in group overflow-hidden"
-            aria-label="Preview cover image"
-          >
-            <img
-              src={activeProfile.coverImage}
-              alt="Cover"
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-            />
-            <span className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-          </button>
+          {/* 3D Sphere of Skills instead of Cover Image */}
+          <Skills3DSphere
+            skills={ALL_SKILLS}
+            className="h-64 sm:h-80 md:h-96 neo-inset rounded-none border-none p-0 z-0"
+          />
 
           {/* Profile Container */}
-          <div className="relative px-6 sm:px-8 pb-8">
+          <div className="relative z-10 px-6 sm:px-8 pb-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 sm:-mt-20 sm:mb-4 mb-4">
               {/* Profile Image */}
               <button

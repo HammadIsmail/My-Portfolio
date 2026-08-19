@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import gsap from "gsap";
+import { cn } from "@/lib/utils";
 
 export interface SkillItem {
   name: string;
@@ -16,6 +17,7 @@ interface Skills3DSphereProps {
   skills: SkillItem[];
   activeCategory?: string;
   onSelectSkill?: (skill: SkillItem) => void;
+  className?: string;
 }
 
 interface Point3D {
@@ -38,6 +40,7 @@ export const Skills3DSphere: React.FC<Skills3DSphereProps> = ({
   skills,
   activeCategory = "All",
   onSelectSkill,
+  className,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -65,15 +68,25 @@ export const Skills3DSphere: React.FC<Skills3DSphereProps> = ({
     const updateSize = () => {
       if (!containerRef.current) return;
       const width = containerRef.current.clientWidth;
+      const height = containerRef.current.clientHeight || 500;
+
+      // Determine radius based on width first (original behavior)
+      let r = 230;
       if (width < 480) {
-        setRadius(120);
+        r = 120;
       } else if (width < 768) {
-        setRadius(165);
+        r = 165;
       } else if (width < 1024) {
-        setRadius(200);
-      } else {
-        setRadius(230);
+        r = 200;
       }
+
+      // Ensure it doesn't exceed 40% of the container height to prevent top/bottom clipping
+      const maxRadiusByHeight = height * 0.4;
+      if (r > maxRadiusByHeight) {
+        r = Math.max(70, Math.floor(maxRadiusByHeight));
+      }
+
+      setRadius(r);
     };
 
     updateSize();
@@ -270,7 +283,11 @@ export const Skills3DSphere: React.FC<Skills3DSphereProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[460px] sm:h-[540px] md:h-[600px] flex items-center justify-center select-none overflow-hidden touch-none cursor-grab active:cursor-grabbing neo-raised rounded-3xl p-4"
+      className={cn(
+        "relative w-full h-[460px] sm:h-[540px] md:h-[600px] flex items-center justify-center select-none overflow-hidden touch-none cursor-grab active:cursor-grabbing rounded-3xl p-4",
+        !className && "neo-raised",
+        className
+      )}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -291,7 +308,7 @@ export const Skills3DSphere: React.FC<Skills3DSphereProps> = ({
       />
 
       {/* Floating 3D Nodes */}
-      <div className="relative w-0 h-0 flex items-center justify-center">
+      <div className="absolute top-1/2 left-1/2 w-0 h-0 flex items-center justify-center">
         {projectedPoints.map((pt) => {
           const isHovered = hoveredSkill?.name === pt.skill.name;
           const isSelected = selectedSkill?.name === pt.skill.name;
@@ -301,9 +318,8 @@ export const Skills3DSphere: React.FC<Skills3DSphereProps> = ({
               key={pt.id}
               className="absolute top-0 left-0 transition-transform duration-75 ease-out"
               style={{
-                transform: `translate3d(${pt.screenX}px, ${pt.screenY}px, 0px) translate(-50%, -50%) scale(${
-                  isHovered ? pt.scale * 1.25 : pt.scale
-                })`,
+                transform: `translate3d(${pt.screenX}px, ${pt.screenY}px, 0px) translate(-50%, -50%) scale(${isHovered ? pt.scale * 1.25 : pt.scale
+                  })`,
                 opacity: pt.opacity,
                 zIndex: isHovered ? 9999 : pt.zIndex,
               }}
@@ -322,31 +338,28 @@ export const Skills3DSphere: React.FC<Skills3DSphereProps> = ({
               }}
             >
               <div
-                className={`group flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-2xl transition-all duration-300 backdrop-blur-md cursor-pointer ${
-                  isHovered || isSelected
+                className={`group flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-2xl transition-all duration-300 backdrop-blur-md cursor-pointer ${isHovered || isSelected
                     ? "neo-raised ring-2 ring-primary shadow-xl bg-card/95 scale-110"
                     : pt.opacity > 0.6
-                    ? "neo-raised-sm bg-card/80 hover:bg-card"
-                    : "neo-inset-sm bg-card/60"
-                }`}
+                      ? "neo-raised-sm bg-card/80 hover:bg-card"
+                      : "neo-inset-sm bg-card/60"
+                  }`}
               >
-                <div 
+                <div
                   className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center shrink-0"
                   data-skill={pt.skill.name}
                 >
                   <Icon
                     icon={pt.skill.icon}
-                    className={`w-full h-full transition-transform duration-300 ${
-                      isHovered ? "scale-110 rotate-6" : ""
-                    } ${(pt.skill.name === "Kafka" || pt.skill.name === "Neo4j") ? "kafka-neo4j-icon" : ""}`}
+                    className={`w-full h-full transition-transform duration-300 ${isHovered ? "scale-110 rotate-6" : ""
+                      } ${(pt.skill.name === "Kafka" || pt.skill.name === "Neo4j") ? "kafka-neo4j-icon" : ""}`}
                   />
                 </div>
                 <span
-                  className={`text-xs sm:text-sm font-semibold tracking-wide whitespace-nowrap transition-colors ${
-                    isHovered || isSelected
+                  className={`text-xs sm:text-sm font-semibold tracking-wide whitespace-nowrap transition-colors ${isHovered || isSelected
                       ? "text-primary font-bold"
                       : "text-foreground/90"
-                  }`}
+                    }`}
                 >
                   {pt.skill.name}
                 </span>

@@ -5,7 +5,7 @@ import { Icon } from "@iconify/react";
 import { usePortfolio } from "@/context/PortfolioContext";
 import Skills3DSphere, { SkillItem } from "./Skills3DSphere";
 
-const ALL_SKILLS: SkillItem[] = [
+export const ALL_SKILLS: SkillItem[] = [
   // Frontend
   { name: "React", icon: "logos:react", category: "Frontend", level: "Expert" },
   { name: "Next.js", icon: "logos:nextjs-icon", category: "Frontend", level: "Expert" },
