@@ -1,15 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
-import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHackathonsQuery } from "@/hooks/usePortfolioQueries";
-
 import { AnimatedCardShowcase } from "@/components/AnimatedCardShowcase";
+import { Trophy, ExternalLink } from "lucide-react";
 
 const Hackathons = () => {
   const { ref, isVisible } = useScrollAnimation();
@@ -20,41 +17,29 @@ const Hackathons = () => {
 
   if (isLoading && !hackathons) {
     return (
-      <section id="hackathons" className={isMobile ? "py-12 sm:py-16" : "py-6"}>
+      <section id="hackathons" className="py-12 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6 max-w-4xl space-y-6">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 font-serif">
-            Hackathons
-          </h2>
-          <div className="space-y-6">
-            {[1].map((i) => (
-              <div key={i} className="bg-card border border-border rounded-3xl p-6 sm:p-8 flex flex-col gap-6">
-                <Skeleton className="h-64 sm:h-80 w-full rounded-2xl" />
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-                <div className="flex gap-2 pt-2">
-                  <Skeleton className="h-6 w-16 rounded-full" />
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </div>
-                <Skeleton className="h-12 w-full rounded-full" />
-              </div>
-            ))}
-          </div>
+          <Skeleton className="h-64 sm:h-80 w-full rounded-3xl" />
         </div>
       </section>
     );
   }
 
   return (
-    <section ref={ref} id="hackathons" className={isMobile ? "py-12 sm:py-16" : "py-8"}>
+    <section ref={ref} id="hackathons" className="py-8 sm:py-12 scroll-mt-24">
       <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
-        <h2 className="block md:hidden text-3xl sm:text-4xl font-bold text-center mb-8 font-serif">
-          Hackathons
-        </h2>
-        
+        <div className="text-center sm:text-left mb-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-300 border-2 border-[var(--pop-border)] font-extrabold text-xs mb-2 shadow-[2px_2px_0px_#1e1b2e]">
+            <Trophy className="w-3.5 h-3.5" />
+            <span>COMPETITIONS & HACKATHONS</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+            Hackathon Victories
+          </h2>
+        </div>
+
         {hackathonList.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-center py-12 text-muted-foreground font-bold">
             No hackathons posted yet. Stay tuned!
           </div>
         ) : (
@@ -63,56 +48,47 @@ const Hackathons = () => {
               items={hackathonList}
               getItemKey={(hackathon) => hackathon.id}
               renderItem={(hackathon) => (
-                <div
-                  className="neo-raised neo-raised-hover rounded-3xl p-6 sm:p-8 flex flex-col space-y-6 w-full"
-                >
-                  {/* Cover Image at top */}
-                  <div className="w-full relative aspect-[16/10] sm:aspect-video rounded-2xl overflow-hidden neo-inset flex items-center justify-center p-3 sm:p-6">
+                <div className="pop-card-lg p-6 sm:p-8 flex flex-col space-y-6 w-full">
+                  {/* Cover Image */}
+                  <div className="w-full aspect-[16/10] sm:aspect-video rounded-2xl overflow-hidden border-2.5 border-[var(--pop-border)] shadow-[3.5px_3.5px_0px_#1e1b2e] flex items-center justify-center p-3 bg-slate-100 dark:bg-slate-900">
                     <img
                       src={hackathon.image}
                       alt={hackathon.title}
-                      className="w-full h-full object-contain max-h-[460px] rounded-xl"
+                      className="w-full h-full object-contain rounded-xl"
                     />
                   </div>
 
-                  {/* Subtitle Badge */}
                   <div>
-                    <span className="inline-block neo-inset-sm text-xs font-semibold uppercase tracking-wider text-primary px-3 py-1 rounded-full">
-                      Hackathon Experience
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif leading-tight text-foreground mt-2">
+                    <h3 className="text-2xl sm:text-3xl font-black text-foreground leading-tight">
                       {hackathon.title}
                     </h3>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
+                  <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-medium">
                     {hackathon.description}
                   </p>
 
-                  {/* Golden Pill Tags */}
-                  <div className="flex flex-wrap gap-2 pt-2">
+                  <div className="flex flex-wrap gap-2">
                     {hackathon.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs sm:text-sm px-3.5 py-1.5 rounded-full neo-pill-accent font-semibold"
+                        className="px-3 py-1 rounded-full text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-foreground border border-[var(--pop-border)] shadow-[1.5px_1.5px_0px_#1e1b2e]"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
                   
-                  {/* Stacked Full-Width Pill Buttons */}
-                  <div className="flex flex-col gap-3 pt-4 w-full">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full">
                     <button
-                      className="w-full rounded-2xl py-3.5 px-6 text-base font-semibold neo-button-primary touch-manipulation"
+                      className="flex-1 py-3.5 px-6 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm border-2.5 border-[var(--pop-border)] shadow-[3.5px_3.5px_0px_#1e1b2e]"
                       onClick={() =>
                         isMobile
                           ? router.push(`/hackathon/${hackathon.id}`)
                           : openHackathon(hackathon.id)
                       }
                     >
-                      View Experience
+                      View Full Story ✦
                     </button>
                     
                     {hackathon.demoUrl && (
@@ -120,20 +96,10 @@ const Hackathons = () => {
                         href={hackathon.demoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full text-center rounded-2xl py-3.5 px-6 text-base font-medium neo-button touch-manipulation"
+                        className="py-3.5 px-6 rounded-full bg-card hover:bg-slate-100 dark:hover:bg-slate-800 text-foreground font-extrabold text-sm border-2 border-[var(--pop-border)] shadow-[3.5px_3.5px_0px_#1e1b2e] flex items-center justify-center gap-1.5"
                       >
-                        Live Demo
-                      </a>
-                    )}
-
-                    {hackathon.githubUrl && (
-                      <a
-                        href={hackathon.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full text-center rounded-2xl py-3.5 px-6 text-base font-medium neo-button touch-manipulation"
-                      >
-                        Github Repo
+                        <ExternalLink className="w-4 h-4 text-purple-600" />
+                        <span>Live Demo</span>
                       </a>
                     )}
                   </div>

@@ -1,9 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { Card } from "@/components/ui/card";
 import type { Service } from "@/types/service";
-import { cn } from "@/lib/utils";
 
 type ServiceCardProps = {
   service: Service;
@@ -19,23 +17,11 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: prefersReducedMotion ? 0 : 0.5,
+        duration: prefersReducedMotion ? 0 : 0.4,
         delay: prefersReducedMotion ? 0 : index * 0.08,
-        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
-
-  const imageFloat = prefersReducedMotion
-    ? {}
-    : {
-      y: [0, -4, 0],
-      transition: {
-        duration: 4 + index * 0.3,
-        repeat: Infinity,
-        ease: "easeInOut" as const,
-      },
-    };
 
   return (
     <motion.div
@@ -45,48 +31,35 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       viewport={{ once: true, margin: "-40px" }}
       className="h-full"
     >
-      <div
-        className={cn(
-          "group flex h-full min-h-[440px] flex-col overflow-hidden rounded-3xl neo-raised neo-raised-hover transition-all duration-300"
-        )}
-      >
-        <div className="relative flex min-h-[160px] flex-[0.45] items-center justify-center m-4 p-4 neo-inset rounded-2xl">
-          <motion.div
-            animate={imageFloat}
-            className="relative flex h-full w-full items-center justify-center"
-          >
-            <motion.img
+      <div className="pop-card-lg p-6 sm:p-8 flex flex-col justify-between h-full hover:translate-y-[-3px] transition-all">
+        <div>
+          <div className="w-full aspect-video rounded-2xl border-2 border-[var(--pop-border)] shadow-[3px_3px_0px_#1e1b2e] mb-4 bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-3">
+            <img
               src={service.image}
               alt={service.imageAlt}
-              className="max-h-36 max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-              whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="max-h-36 max-w-full object-contain"
               draggable={false}
             />
-          </motion.div>
-        </div>
+          </div>
 
-        <div className="flex flex-1 flex-col px-6 pb-6 pt-2 sm:px-8 sm:pb-8">
-          <h3 className="text-xl font-bold font-serif text-foreground sm:text-2xl">
+          <h3 className="text-2xl font-black text-foreground mb-2">
             {service.title}
           </h3>
-          <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground sm:text-base">
+
+          <p className="text-sm text-muted-foreground font-medium leading-relaxed mb-4">
             {service.description}
           </p>
-
-          <ul
-            className="mt-5 flex flex-wrap gap-2"
-            aria-label={`${service.title} technologies`}
-          >
-            {service.technologies.map((tech) => (
-              <li key={tech}>
-                <span className="inline-block rounded-full neo-inset-sm px-3 py-1 text-xs font-semibold text-primary">
-                  {tech}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
+
+        <ul className="flex flex-wrap gap-1.5 pt-2" aria-label={`${service.title} technologies`}>
+          {service.technologies.map((tech) => (
+            <li key={tech}>
+              <span className="inline-block rounded-full bg-slate-100 dark:bg-slate-800 text-foreground border border-[var(--pop-border)] shadow-[1px_1px_0px_#1e1b2e] px-3 py-1 text-xs font-extrabold">
+                {tech}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </motion.div>
   );

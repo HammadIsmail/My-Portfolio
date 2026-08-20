@@ -67,7 +67,6 @@ type PortfolioContextValue = {
 
 const PortfolioContext = createContext<PortfolioContextValue | null>(null);
 
-// Helper to parse section & detail ID from current URL hash
 const parseHashState = (): { section: SectionId | null; detailId: string | null } => {
   if (typeof window === "undefined") return { section: null, detailId: null };
   const rawHash = window.location.hash.replace("#", "").trim();
@@ -83,7 +82,6 @@ const parseHashState = (): { section: SectionId | null; detailId: string | null 
   return { section, detailId };
 };
 
-// Helper to update URL hash & localStorage atomically
 const updateUrlHash = (section: SectionId, detailType?: "project" | "hackathon" | "blog", detailId?: string | null) => {
   if (typeof window === "undefined") return;
 
@@ -113,7 +111,6 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [selectedHackathonId, setSelectedHackathonId] = useState<string | null>(null);
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
 
-  // Cached state
   const [projects, setProjects] = useState<ProjectType[] | null>(null);
   const [projectsLoading, setProjectsLoading] = useState(false);
 
@@ -123,7 +120,6 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [blogs, setBlogs] = useState<BlogType[] | null>(null);
   const [blogsLoading, setBlogsLoading] = useState(false);
 
-  // Sync state on client mount (handles reloads, direct URL entry, and localStorage fallback)
   useEffect(() => {
     const { section: hashSection, detailId } = parseHashState();
     let targetSection: SectionId = "profile";
@@ -157,7 +153,6 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       projId || hackId || blogId || undefined
     );
 
-    // Smooth scroll on mobile if reloaded on non-profile section
     if (isMobile && targetSection !== "profile") {
       setTimeout(() => {
         const el = document.getElementById(targetSection);
@@ -166,7 +161,6 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     }
   }, [isMobile]);
 
-  // Sync state on browser back/forward (popstate/hashchange)
   useEffect(() => {
     const handleHashChange = () => {
       const { section: hashSection, detailId } = parseHashState();
@@ -213,7 +207,10 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       if (prev !== null) return prev;
       setProjectsLoading(true);
       fetch("/api/projects")
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) return { projects: [] };
+          return res.json();
+        })
         .then((data) => {
           const formatted = (data.projects || []).map((p: any) => ({
             id: p._id ? p._id.toString() : p.id,
@@ -226,8 +223,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           }));
           setProjects(formatted);
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(() => {
           setProjects([]);
         })
         .finally(() => setProjectsLoading(false));
@@ -240,7 +236,10 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       if (prev !== null) return prev;
       setHackathonsLoading(true);
       fetch("/api/hackathons")
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) return { hackathons: [] };
+          return res.json();
+        })
         .then((data) => {
           const formatted = (data.hackathons || []).map((h: any) => ({
             id: h._id ? h._id.toString() : h.id,
@@ -254,8 +253,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           }));
           setHackathons(formatted);
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(() => {
           setHackathons([]);
         })
         .finally(() => setHackathonsLoading(false));
@@ -268,7 +266,10 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       if (prev !== null) return prev;
       setBlogsLoading(true);
       fetch("/api/blogs")
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) return { blogs: [] };
+          return res.json();
+        })
         .then((data) => {
           const formatted = (data.blogs || []).map((b: any) => ({
             id: b._id ? b._id.toString() : b.id,
@@ -280,8 +281,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           }));
           setBlogs(formatted);
         })
-        .catch((err) => {
-          console.error(err);
+        .catch(() => {
           setBlogs([]);
         })
         .finally(() => setBlogsLoading(false));

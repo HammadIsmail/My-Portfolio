@@ -1,122 +1,110 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 215 28% 93%;
-    --foreground: 215 25% 15%;
+    --background: 40 30% 97%;
+    --foreground: 255 25% 15%;
 
-    --card: 215 28% 93%;
-    --card-foreground: 215 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 255 25% 15%;
 
-    --popover: 215 28% 93%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 255 25% 15%;
 
-    --primary: 45 100% 51%;
-    --primary-foreground: 0 0% 15%;
+    --primary: 271 81% 56%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 20% 90%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 24 95% 53%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 215 20% 90%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 40 20% 92%;
+    --muted-foreground: 255 10% 45%;
 
-    --accent: 45 100% 51%;
-    --accent-foreground: 0 0% 15%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 215 20% 86%;
-    --input: 215 20% 88%;
-    --ring: 45 100% 51%;
+    --border: 255 25% 15%;
+    --input: 255 20% 90%;
+    --ring: 271 81% 56%;
 
-    --radius: 1rem;
+    --radius: 1.25rem;
 
-    --sidebar-background: 215 28% 93%;
-    --sidebar-foreground: 215 25% 15%;
-    --sidebar-primary: 45 100% 51%;
-    --sidebar-primary-foreground: 0 0% 15%;
-    --sidebar-accent: 215 20% 90%;
-    --sidebar-accent-foreground: 215 25% 15%;
-    --sidebar-border: 215 20% 86%;
-    --sidebar-ring: 45 100% 51%;
+    --sidebar-background: 40 30% 97%;
+    --sidebar-foreground: 255 25% 15%;
+    --sidebar-primary: 271 81% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 24 95% 53%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 255 25% 15%;
+    --sidebar-ring: 271 81% 56%;
 
-    /* Neomorphism Shadow Tokens Light */
+    /* Neo-Pop Shadows */
+    --pop-border: #1e1b2e;
+    --pop-shadow-solid: 4px 4px 0px #1e1b2e;
+    --pop-shadow-lg: 6px 6px 0px #1e1b2e;
+    --pop-shadow-sm: 2px 2px 0px #1e1b2e;
+    --pop-shadow-hover: 8px 8px 0px #1e1b2e;
+
+    /* Legacy Neomorphism Shadow Tokens for fallback */
     --neo-shadow-raised: -7px -7px 16px rgba(255, 255, 255, 0.85), 7px 7px 16px rgba(165, 180, 202, 0.45);
     --neo-shadow-raised-sm: -4px -4px 10px rgba(255, 255, 255, 0.85), 4px 4px 10px rgba(165, 180, 202, 0.45);
     --neo-shadow-raised-hover: -9px -9px 22px rgba(255, 255, 255, 0.95), 9px 9px 22px rgba(165, 180, 202, 0.55);
     --neo-shadow-inset: inset 4px 4px 8px rgba(165, 180, 202, 0.45), inset -4px -4px 8px rgba(255, 255, 255, 0.85);
     --neo-shadow-inset-sm: inset 2px 2px 5px rgba(165, 180, 202, 0.4), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
 
-    /* Custom portfolio tokens */
-    --hero-accent: 45 100% 51%;
-    --text-heading: 215 25% 15%;
-    --text-body: 215 15% 35%;
-    
-    /* Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-card: var(--neo-shadow-raised);
-    --shadow-hover: var(--neo-shadow-raised-hover);
+    --hero-accent: 271 81% 56%;
+    --text-heading: 255 25% 15%;
+    --text-body: 255 15% 35%;
   }
 
   .dark {
-    --background: 220 22% 13%;
-    --foreground: 215 20% 95%;
+    --background: 255 25% 9%;
+    --foreground: 40 30% 96%;
 
-    --card: 220 22% 13%;
-    --card-foreground: 215 20% 95%;
+    --card: 255 22% 14%;
+    --card-foreground: 40 30% 96%;
 
-    --popover: 220 22% 13%;
-    --popover-foreground: 215 20% 95%;
+    --popover: 255 22% 14%;
+    --popover-foreground: 40 30% 96%;
 
-    --primary: 45 100% 51%;
-    --primary-foreground: 0 0% 15%;
+    --primary: 271 81% 64%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 18% 18%;
-    --secondary-foreground: 215 20% 95%;
+    --secondary: 24 95% 58%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 18% 18%;
-    --muted-foreground: 215 15% 65%;
+    --muted: 255 20% 18%;
+    --muted-foreground: 40 15% 70%;
 
-    --accent: 45 100% 51%;
-    --accent-foreground: 0 0% 15%;
+    --accent: 142 71% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --border: 40 20% 85%;
+    --input: 255 20% 22%;
+    --ring: 271 81% 64%;
 
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 45 100% 51%;
-    
-    --sidebar-background: 220 22% 13%;
-    --sidebar-foreground: 215 20% 95%;
-    --sidebar-primary: 45 100% 51%;
-    --sidebar-primary-foreground: 0 0% 15%;
-    --sidebar-accent: 220 18% 18%;
-    --sidebar-accent-foreground: 215 20% 95%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 45 100% 51%;
+    --pop-border: #ffffff;
+    --pop-shadow-solid: 4px 4px 0px #ffffff;
+    --pop-shadow-lg: 6px 6px 0px #ffffff;
+    --pop-shadow-sm: 2px 2px 0px #ffffff;
+    --pop-shadow-hover: 7px 7px 0px #ffffff;
 
-    /* Neomorphism Shadow Tokens Dark */
     --neo-shadow-raised: -6px -6px 14px rgba(38, 46, 60, 0.6), 6px 6px 14px rgba(12, 15, 21, 0.75);
     --neo-shadow-raised-sm: -3px -3px 8px rgba(38, 46, 60, 0.6), 3px 3px 8px rgba(12, 15, 21, 0.75);
     --neo-shadow-raised-hover: -8px -8px 18px rgba(38, 46, 60, 0.7), 8px 8px 18px rgba(12, 15, 21, 0.85);
     --neo-shadow-inset: inset 4px 4px 8px rgba(10, 13, 18, 0.8), inset -4px -4px 8px rgba(40, 49, 64, 0.5);
     --neo-shadow-inset-sm: inset 2px 2px 5px rgba(10, 13, 18, 0.75), inset -2px -2px 5px rgba(40, 49, 64, 0.45);
 
-    --hero-accent: 45 100% 51%;
-    --text-heading: 215 20% 95%;
-    --text-body: 215 15% 75%;
-    --shadow-card: var(--neo-shadow-raised);
-    --shadow-hover: var(--neo-shadow-raised-hover);
+    --hero-accent: 271 81% 64%;
+    --text-heading: 40 30% 96%;
+    --text-body: 40 15% 80%;
   }
 }
 
@@ -125,13 +113,25 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  body, .bg-background {
+    @apply text-foreground transition-colors duration-300;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: hsl(var(--background));
+    background-image: radial-gradient(rgba(147, 51, 234, 0.22) 2px, transparent 2px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
+  }
+
+  .dark body, .dark .bg-background {
+    background-color: hsl(var(--background));
+    background-image: radial-gradient(rgba(168, 85, 247, 0.28) 2px, transparent 2px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
     color: hsl(var(--text-heading));
   }
 
@@ -141,6 +141,116 @@ All colors MUST be HSL.
 }
 
 @layer components {
+  /* Dotted Background Utility */
+  .bg-dot-grid {
+    background-image: radial-gradient(rgba(147, 51, 234, 0.22) 2px, transparent 2px);
+    background-size: 24px 24px;
+  }
+
+  .dark .bg-dot-grid {
+    background-image: radial-gradient(rgba(168, 85, 247, 0.28) 2px, transparent 2px);
+    background-size: 24px 24px;
+  }
+
+  /* Notebook Lined Background Utility (Matching Reference Screenshot 2) */
+  .notebook-lined-bg {
+    background-color: #faf7f2;
+    background-image: 
+      radial-gradient(rgba(147, 51, 234, 0.18) 1.8px, transparent 1.8px),
+      linear-gradient(to bottom, transparent 27px, rgba(30, 27, 46, 0.08) 28px);
+    background-size: 24px 24px, 100% 28px;
+  }
+
+  .dark .notebook-lined-bg {
+    background-color: #161224;
+    background-image: 
+      radial-gradient(rgba(168, 85, 247, 0.25) 1.8px, transparent 1.8px),
+      linear-gradient(to bottom, transparent 27px, rgba(255, 255, 255, 0.08) 28px);
+    background-size: 24px 24px, 100% 28px;
+  }
+
+  /* Neo-Pop Utility Classes */
+  .pop-card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 2.5px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-solid);
+    border-radius: var(--radius);
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pop-card-lg {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 3px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-lg);
+    border-radius: 1.5rem;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pop-pill {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 2px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-sm);
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+  }
+
+  .pop-btn {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 2px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-solid);
+    border-radius: 9999px;
+    font-weight: 700;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+  }
+
+  .pop-btn:hover {
+    transform: translateY(-2px) translateX(-2px);
+    box-shadow: var(--pop-shadow-hover);
+  }
+
+  .pop-btn:active {
+    transform: translateY(2px) translateX(2px);
+    box-shadow: 1px 1px 0px var(--pop-border);
+  }
+
+  .pop-btn-purple {
+    background-color: #9333ea;
+    color: #ffffff;
+    border: 2.5px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-solid);
+    border-radius: 9999px;
+    font-weight: 800;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pop-btn-purple:hover {
+    background-color: #a855f7;
+    transform: translateY(-2px) translateX(-2px);
+    box-shadow: var(--pop-shadow-hover);
+  }
+
+  .pop-btn-orange {
+    background-color: #f97316;
+    color: #ffffff;
+    border: 2.5px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-solid);
+    border-radius: 9999px;
+    font-weight: 800;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .pop-btn-orange:hover {
+    background-color: #fb923c;
+    transform: translateY(-2px) translateX(-2px);
+    box-shadow: var(--pop-shadow-hover);
+  }
+
+  /* Legacy Neomorphism Support for subcomponents */
   .neo-surface {
     background-color: hsl(var(--card));
     color: hsl(var(--foreground));
@@ -148,108 +258,82 @@ All colors MUST be HSL.
 
   .neo-raised {
     background-color: hsl(var(--card));
-    box-shadow: var(--neo-shadow-raised);
-    border: 1px solid hsl(var(--border) / 0.5);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-solid);
+    transition: all 0.25s ease;
   }
 
   .neo-raised-sm {
     background-color: hsl(var(--card));
-    box-shadow: var(--neo-shadow-raised-sm);
-    border: 1px solid hsl(var(--border) / 0.4);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .neo-raised-hover {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-sm);
+    transition: all 0.2s ease;
   }
 
   .neo-raised-hover:hover {
-    box-shadow: var(--neo-shadow-raised-hover);
+    box-shadow: var(--pop-shadow-lg);
     transform: translateY(-2px);
   }
 
   .neo-inset {
     background-color: hsl(var(--card));
-    box-shadow: var(--neo-shadow-inset);
-    border: 1px solid hsl(var(--border) / 0.3);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--pop-border);
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
   }
 
   .neo-inset-sm {
     background-color: hsl(var(--card));
-    box-shadow: var(--neo-shadow-inset-sm);
-    border: 1px solid hsl(var(--border) / 0.3);
+    border: 1.5px solid var(--pop-border);
   }
 
   .neo-button {
     background-color: hsl(var(--card));
     color: hsl(var(--foreground));
-    box-shadow: var(--neo-shadow-raised-sm);
-    border: 1px solid hsl(var(--border) / 0.5);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-sm);
+    font-weight: 700;
+    transition: all 0.2s ease;
   }
 
   .neo-button:hover {
-    box-shadow: var(--neo-shadow-raised-hover);
+    box-shadow: var(--pop-shadow-solid);
     transform: translateY(-1px);
-    color: hsl(var(--primary));
-  }
-
-  .neo-button:active, .neo-button-active {
-    box-shadow: var(--neo-shadow-inset-sm) !important;
-    transform: translateY(1px) !important;
   }
 
   .neo-button-primary {
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    box-shadow: var(--neo-shadow-raised-sm);
-    border: 1px solid hsl(var(--primary) / 0.8);
-    font-weight: 600;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #9333ea;
+    color: #ffffff;
+    border: 2.5px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-solid);
+    font-weight: 800;
+    transition: all 0.2s ease;
   }
 
   .neo-button-primary:hover {
-    box-shadow: var(--neo-shadow-raised-hover);
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-  }
-
-  .neo-button-primary:active {
-    box-shadow: var(--neo-shadow-inset-sm);
-    transform: translateY(1px);
+    background-color: #a855f7;
+    box-shadow: var(--pop-shadow-lg);
+    transform: translateY(-2px);
   }
 
   .neo-input {
     background-color: hsl(var(--card));
     color: hsl(var(--foreground));
-    box-shadow: var(--neo-shadow-inset);
-    border: 1px solid hsl(var(--border) / 0.4);
-    transition: all 0.2s ease-in-out;
+    border: 2.5px solid var(--pop-border);
+    box-shadow: var(--pop-shadow-sm);
+    transition: all 0.2s ease;
   }
 
   .neo-input:focus {
     outline: none;
-    box-shadow: var(--neo-shadow-inset), 0 0 0 2px hsl(var(--ring) / 0.6);
-    border-color: hsl(var(--ring));
-  }
-
-  .neo-pill {
-    box-shadow: var(--neo-shadow-raised-sm);
-    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: var(--pop-shadow-solid);
+    border-color: #9333ea;
   }
 
   .neo-pill-accent {
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    box-shadow: var(--neo-shadow-raised-sm);
-  }
-
-  .neo-icon-box {
-    background-color: hsl(var(--card));
-    box-shadow: var(--neo-shadow-raised-sm);
-    border: 1px solid hsl(var(--border) / 0.4);
+    background-color: #9333ea;
+    color: #ffffff;
+    border: 1.5px solid var(--pop-border);
+    box-shadow: 2px 2px 0px var(--pop-border);
   }
 
   .scrollbar-none {
@@ -263,25 +347,28 @@ All colors MUST be HSL.
   }
 }
 
-@keyframes bounce-subtle {
+@keyframes float-slow {
   0%, 100% {
-    transform: translateY(0);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px) rotate(1.5deg);
   }
 }
 
-.animate-bounce-subtle {
-  animation: bounce-subtle 2s ease-in-out infinite;
+@keyframes spin-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-/* In dark mode, make the entire Kafka logo white */
-.dark [data-skill="Kafka"] svg path {
-  fill: #ffffff !important;
+.animate-float-slow {
+  animation: float-slow 5s ease-in-out infinite;
 }
 
-/* In dark mode, make only the text and outlines of Neo4j white (keeps the blue circle colors) */
-.dark [data-skill="Neo4j"] svg path:not([fill]) {
-  fill: #ffffff !important;
+.animate-spin-orbit {
+  animation: spin-orbit 20s linear infinite;
 }

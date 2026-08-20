@@ -4,9 +4,9 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function Home() {
   return (
-    <div className="min-h-screen md:h-screen md:overflow-hidden">
+    <div className="min-h-screen bg-background relative selection:bg-purple-500 selection:text-white">
       <Sidebar />
-      <main className="pt-16 md:pt-0 md:fixed md:top-0 md:right-0 md:bottom-0 md:left-64 md:overflow-hidden">
+      <main className="pt-20 md:pt-24 pb-12 w-full">
         <PortfolioContent />
         <WhatsAppButton />
       </main>

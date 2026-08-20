@@ -1,15 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { useRouter } from "next/navigation";
 import { usePortfolio } from "@/context/PortfolioContext";
-import { Calendar } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-
+import { Calendar, BookOpen } from "lucide-react";
 import { useBlogsQuery } from "@/hooks/usePortfolioQueries";
-
 import { AnimatedCardShowcase } from "@/components/AnimatedCardShowcase";
 
 const Blogs = () => {
@@ -19,111 +14,82 @@ const Blogs = () => {
   const { data: blogs, isLoading } = useBlogsQuery();
   const blogList = blogs || [];
 
-  if (isLoading && !blogs) {
-    return (
-      <section id="blogs" className={isMobile ? "py-12 sm:py-16" : "py-6"}>
-        <div className="container mx-auto px-4 sm:px-6 max-w-4xl space-y-6">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-12 font-serif">
-            Blogs & Learnings
-          </h2>
-          <div className="space-y-6">
-            {[1].map((i) => (
-              <div key={i} className="bg-card border border-border rounded-3xl p-6 sm:p-8 flex flex-col gap-4">
-                <Skeleton className="aspect-video w-full rounded-2xl" />
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-                <div className="flex gap-2 pt-2">
-                  <Skeleton className="h-6 w-16 rounded-full" />
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
+  if (isLoading || blogList.length === 0) {
+    return null;
   }
 
   return (
-    <section ref={ref} id="blogs" className={isMobile ? "py-12 sm:py-16" : "py-8"}>
+    <section ref={ref} id="blogs" className="py-8 sm:py-12 scroll-mt-24">
       <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
-        <h2 className="block md:hidden text-3xl sm:text-4xl font-bold text-center mb-8 font-serif">
-          Blogs & Learnings
-        </h2>
-
-        {blogList.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            No articles posted yet. Stay tuned for learnings!
+        <div className="text-center sm:text-left mb-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 border-2 border-[var(--pop-border)] font-extrabold text-xs mb-2 shadow-[2px_2px_0px_#1e1b2e]">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>BLOGS & ARTICLES</span>
           </div>
-        ) : (
-          <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <AnimatedCardShowcase
-              items={blogList}
-              getItemKey={(blog) => blog.id}
-              renderItem={(blog) => (
-                <div
-                  className="neo-raised neo-raised-hover rounded-3xl p-6 sm:p-8 flex flex-col space-y-6 w-full"
-                >
-                  {/* Cover Image at top */}
-                  <div className="w-full relative aspect-[16/10] sm:aspect-video rounded-2xl overflow-hidden neo-inset flex items-center justify-center p-3 sm:p-6">
-                    <img
-                      src={blog.image}
-                      alt={blog.title}
-                      className="w-full h-full object-contain max-h-[460px] rounded-xl"
-                    />
-                  </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight">
+            Latest Writings
+          </h2>
+        </div>
 
-                  {/* Date & Title */}
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm neo-inset-sm px-3 py-1 rounded-full text-muted-foreground mb-3">
-                      <Calendar className="w-4 h-4 text-primary" />
-                      <span>
-                        {blog.createdAt
-                          ? new Date(blog.createdAt).toLocaleDateString(undefined, { dateStyle: "long" })
-                          : "Recently"}
-                      </span>
-                    </div>
-                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-serif leading-tight text-foreground">
-                      {blog.title}
-                    </h3>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
-                    {blog.description}
-                  </p>
-
-                  {/* Golden Pill Tags */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {blog.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs sm:text-sm px-3.5 py-1.5 rounded-full neo-pill-accent font-semibold"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Stacked Full-Width Pill Button */}
-                  <div className="pt-4 w-full">
-                    <button
-                      className="w-full rounded-2xl py-3.5 px-6 text-base font-semibold neo-button-primary touch-manipulation"
-                      onClick={() =>
-                        isMobile
-                          ? router.push(`/blog/${blog.id}`)
-                          : openBlog(blog.id)
-                      }
-                    >
-                      Read Article →
-                    </button>
-                  </div>
+        <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          <AnimatedCardShowcase
+            items={blogList}
+            getItemKey={(blog) => blog.id}
+            renderItem={(blog) => (
+              <div className="pop-card-lg p-6 sm:p-8 flex flex-col space-y-6 w-full">
+                <div className="w-full aspect-[16/10] sm:aspect-video rounded-2xl overflow-hidden border-2.5 border-[var(--pop-border)] shadow-[3.5px_3.5px_0px_#1e1b2e] flex items-center justify-center p-3 bg-slate-100 dark:bg-slate-900">
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
+                    className="w-full h-full object-contain rounded-xl"
+                  />
                 </div>
-              )}
-            />
-          </div>
-        )}
+
+                <div>
+                  <div className="inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-muted-foreground border border-[var(--pop-border)] mb-3">
+                    <Calendar className="w-3.5 h-3.5 text-purple-600" />
+                    <span>
+                      {blog.createdAt
+                        ? new Date(blog.createdAt).toLocaleDateString(undefined, { dateStyle: "long" })
+                        : "Recently"}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-foreground leading-tight">
+                    {blog.title}
+                  </h3>
+                </div>
+
+                <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-medium">
+                  {blog.description}
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {blog.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 rounded-full text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-foreground border border-[var(--pop-border)] shadow-[1.5px_1.5px_0px_#1e1b2e]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="pt-2 w-full">
+                  <button
+                    className="w-full py-3.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm border-2.5 border-[var(--pop-border)] shadow-[3.5px_3.5px_0px_#1e1b2e] hover:translate-y-[-2px] transition-all"
+                    onClick={() =>
+                      isMobile
+                        ? router.push(`/blog/${blog.id}`)
+                        : openBlog(blog.id)
+                    }
+                  >
+                    Read Article ✦
+                  </button>
+                </div>
+              </div>
+            )}
+          />
+        </div>
       </div>
     </section>
   );

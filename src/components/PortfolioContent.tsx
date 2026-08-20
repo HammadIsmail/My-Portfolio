@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
 import Hackathons from "@/components/Hackathons";
@@ -19,67 +19,41 @@ import InitialPageSkeleton from "@/components/InitialPageSkeleton";
 const PortfolioContent = () => {
   const [isMounted, setIsMounted] = useState(false);
   const {
-    activeSection,
     selectedProjectId,
     selectedHackathonId,
     selectedBlogId,
-    isMobile,
   } = usePortfolio();
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo(0, 0);
-  }, [activeSection, selectedProjectId, selectedHackathonId, selectedBlogId]);
-
   if (!isMounted) {
     return <InitialPageSkeleton />;
   }
 
-  if (isMobile) {
-    return (
-      <>
-        <Hero />
-        <Projects />
-        <Hackathons />
-        <Blogs />
-        <Experience />
-        <Skills />
-        <Services />
-        <Contact />
-        <Footer />
-      </>
-    );
+  // If a detail view is active, present that view
+  if (selectedProjectId) {
+    return <ProjectCaseStudy projectId={selectedProjectId} />;
+  }
+  if (selectedHackathonId) {
+    return <HackathonDetail hackathonId={selectedHackathonId} />;
+  }
+  if (selectedBlogId) {
+    return <BlogDetail blogId={selectedBlogId} />;
   }
 
   return (
-    <div ref={scrollRef} className="h-full overflow-y-auto">
-      {activeSection === "profile" && <Hero />}
-      {activeSection === "projects" &&
-        (selectedProjectId ? (
-          <ProjectCaseStudy projectId={selectedProjectId} />
-        ) : (
-          <Projects />
-        ))}
-      {activeSection === "hackathons" &&
-        (selectedHackathonId ? (
-          <HackathonDetail hackathonId={selectedHackathonId} />
-        ) : (
-          <Hackathons />
-        ))}
-      {activeSection === "blogs" &&
-        (selectedBlogId ? (
-          <BlogDetail blogId={selectedBlogId} />
-        ) : (
-          <Blogs />
-        ))}
-      {activeSection === "experience" && <Experience />}
-      {activeSection === "skills" && <Skills />}
-      {activeSection === "services" && <Services />}
-      {activeSection === "contact" && <Contact />}
+    <div className="flex flex-col gap-12 sm:gap-16 max-w-7xl mx-auto px-4 sm:px-6">
+      <Hero />
+      <Skills />
+      <Projects />
+      <Hackathons />
+      <Blogs />
+      <Experience />
+      <Services />
+      <Contact />
+      <Footer />
     </div>
   );
 };

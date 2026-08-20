@@ -12,7 +12,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 
@@ -59,37 +58,42 @@ export default async function HackathonPage({
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Sidebar />
-      <div className="flex-grow flex flex-col md:pl-64">
-        <main className="flex-grow pt-24 pb-12 sm:pt-24 sm:pb-16 md:pt-12 lg:pt-16 lg:pb-20">
+      <div className="flex-grow flex flex-col pt-24">
+        <main className="flex-grow pb-16">
           <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
-            <Link href="/" className="inline-flex items-center text-sm font-medium neo-button px-4 py-2 rounded-xl hover:text-primary transition-all mb-8 touch-manipulation">
+            <Link
+              href="/"
+              className="inline-flex items-center text-xs font-black bg-card border-2 border-[var(--pop-border)] shadow-[2.5px_2.5px_0px_#1e1b2e] px-4 py-2 rounded-full hover:translate-y-[-1px] transition-all mb-8"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+              Back to Portfolio
             </Link>
 
-            <div className="mb-12 neo-raised rounded-3xl p-6 sm:p-8">
-              <span className="inline-block neo-inset-sm text-xs font-semibold uppercase tracking-wider text-primary px-3 py-1 rounded-full mb-3">Hackathon Experience</span>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-serif mb-4 text-foreground">{hackathon.title}</h1>
-              <p className="text-muted-foreground text-base mb-6 leading-relaxed">{hackathon.description}</p>
+            <div className="mb-8 pop-card-lg p-6 sm:p-8">
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-300 border-2 border-[var(--pop-border)] font-extrabold text-xs mb-3 shadow-[1.5px_1.5px_0px_#1e1b2e]">
+                Hackathon Experience
+              </span>
+              <h1 className="text-3xl sm:text-5xl font-black mb-4 text-foreground">{hackathon.title}</h1>
+              <p className="text-muted-foreground text-sm sm:text-base font-medium mb-6 leading-relaxed">{hackathon.description}</p>
               <div className="flex flex-wrap gap-2 mb-6">
                 {hackathon.tags.map((tag: string) => (
                   <span
                     key={tag}
-                    className="text-xs px-3.5 py-1.5 rounded-full neo-pill-accent font-semibold"
+                    className="text-xs px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-foreground border border-[var(--pop-border)] font-extrabold shadow-[1px_1px_0px_#1e1b2e]"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-3">
                 {hackathon.demoUrl && (
                   <a
                     href={hackathon.demoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="neo-button-primary px-6 py-3 rounded-2xl text-sm font-semibold touch-manipulation"
+                    className="px-6 py-3 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-black border-2 border-[var(--pop-border)] shadow-[3px_3px_0px_#1e1b2e]"
                   >
-                    View Live Demo
+                    Live Demo ✦
                   </a>
                 )}
                 {hackathon.githubUrl && (
@@ -97,9 +101,9 @@ export default async function HackathonPage({
                     href={hackathon.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="neo-button px-6 py-3 rounded-2xl text-sm font-medium touch-manipulation"
+                    className="px-6 py-3 rounded-full bg-card text-foreground text-xs font-black border-2 border-[var(--pop-border)] shadow-[3px_3px_0px_#1e1b2e]"
                   >
-                    Github Repo
+                    GitHub Repo
                   </a>
                 )}
               </div>
@@ -110,7 +114,7 @@ export default async function HackathonPage({
                 <CarouselContent>
                   {hackathon.images.map((img: string, index: number) => (
                     <CarouselItem key={index}>
-                      <div className="aspect-[16/9] relative rounded-2xl overflow-hidden neo-inset p-3 flex items-center justify-center">
+                      <div className="aspect-[16/9] relative rounded-2xl overflow-hidden border-2.5 border-[var(--pop-border)] shadow-[4px_4px_0px_#1e1b2e] p-3 flex items-center justify-center bg-slate-100 dark:bg-slate-900">
                         <img
                           src={img}
                           alt={`${hackathon.title} screenshot ${index + 1}`}
@@ -122,14 +126,14 @@ export default async function HackathonPage({
                 </CarouselContent>
                 {hackathon.images.length > 1 && (
                   <>
-                    <CarouselPrevious className="left-2 sm:-left-12 neo-button" />
-                    <CarouselNext className="right-2 sm:-right-12 neo-button" />
+                    <CarouselPrevious className="left-2 sm:-left-12 bg-card border-2 border-[var(--pop-border)] shadow-[2px_2px_0px_#1e1b2e]" />
+                    <CarouselNext className="right-2 sm:-right-12 bg-card border-2 border-[var(--pop-border)] shadow-[2px_2px_0px_#1e1b2e]" />
                   </>
                 )}
               </Carousel>
               
               {hackathon.videoUrl && (
-                <div className="mt-8 aspect-[16/9] rounded-2xl overflow-hidden neo-inset p-2">
+                <div className="mt-8 aspect-[16/9] rounded-2xl overflow-hidden border-2.5 border-[var(--pop-border)] shadow-[4px_4px_0px_#1e1b2e] p-2 bg-slate-100 dark:bg-slate-900">
                   <iframe
                     src={hackathon.videoUrl}
                     className="w-full h-full rounded-xl"
@@ -140,7 +144,7 @@ export default async function HackathonPage({
               )}
             </div>
 
-            <article className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none neo-raised rounded-3xl p-6 sm:p-10 text-foreground/90 leading-relaxed">
+            <article className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none pop-card-lg p-6 sm:p-10 text-foreground/90 leading-relaxed font-medium">
               {isHtml ? (
                 <div dangerouslySetInnerHTML={{ __html: hackathon.content }} />
               ) : (

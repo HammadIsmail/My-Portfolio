@@ -4,7 +4,7 @@ import Profile from '@/models/Profile';
 import { verifyToken } from '@/lib/auth';
 
 const DEFAULT_PROFILE = {
-  name: "Muhammad Hammad",
+  name: "Hammad",
   title: "FullStack & AI Developer",
   coverImage: "/cover.webp",
   profileImage: "/profile.webp",
