@@ -18,8 +18,38 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000")
+  ),
   title: "Hammad's Portfolio",
-  description: "Muhammad Hammad — Backend & Full-Stack Developer specializing in Java, Spring Boot, TypeScript, React, Next.js, React Native, Python, FastAPI, and AI-powered applications.",
+  description:
+    "Muhammad Hammad — Backend & Full-Stack Developer specializing in Java, Spring Boot, TypeScript, React, Next.js, React Native, Python, FastAPI, and AI-powered applications.",
+  openGraph: {
+    title: "Hammad's Portfolio",
+    description:
+      "Muhammad Hammad — Backend & Full-Stack Developer specializing in Java, Spring Boot, TypeScript, React, Next.js, React Native, Python, FastAPI, and AI-powered applications.",
+    type: "website",
+    images: [
+      {
+        url: "/profile.webp",
+        width: 800,
+        height: 800,
+        alt: "Muhammad Hammad - Backend & Full-Stack Developer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hammad's Portfolio",
+    description:
+      "Muhammad Hammad — Backend & Full-Stack Developer specializing in Java, Spring Boot, TypeScript, React, Next.js, React Native, Python, FastAPI, and AI-powered applications.",
+    images: ["/profile.webp"],
+  },
 };
 
 export default function RootLayout({
